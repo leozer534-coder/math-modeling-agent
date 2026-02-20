@@ -8,6 +8,7 @@ from app.services.redis_manager import redis_manager
 from app.schemas.response import SystemMessage
 from app.services.ws_manager import ws_manager
 from app.utils.log_util import logger
+from app.utils.auth import decode_token
 
 router = APIRouter()
 
@@ -47,18 +48,37 @@ async def _authenticate_websocket(websocket: WebSocket) -> bool:
             )
             return False
 
-        # TODO: 在此处验证 token 有效性（JWT 解码等）
-        # 当前仅检查 token 非空，待认证体系完善后替换为实际验证逻辑
-        token = auth_msg["token"]
-        if not token or len(token) < 8:
-            logger.warning("WebSocket 认证 token 无效")
+        # 验证 JWT token 有效性
+        token = auth_msg.get("token")
+        if not token:
+            logger.warning("WebSocket 认证 token 为空")
             await ws_manager.send_personal_message_json(
-                {"type": "auth_fail", "message": "认证失败，token 无效"},
+                {"type": "auth_fail", "message": "认证失败，token 为空"},
                 websocket,
             )
             return False
 
-        logger.info("WebSocket 认证成功")
+        # 使用 decode_token 验证 JWT 有效性（包括过期时间检查）
+        payload = decode_token(token)
+        if not payload:
+            logger.warning("WebSocket 认证 token 无效或已过期")
+            await ws_manager.send_personal_message_json(
+                {"type": "auth_fail", "message": "认证失败，token 无效或已过期"},
+                websocket,
+            )
+            return False
+
+        # 提取 user_id 用于任务权限校验
+        user_id = payload.get("sub")
+        if not user_id:
+            logger.warning("WebSocket 认证 token 缺少 user_id")
+            await ws_manager.send_personal_message_json(
+                {"type": "auth_fail", "message": "认证失败，token 格式错误"},
+                websocket,
+            )
+            return False
+
+        logger.info("WebSocket 认证成功, user_id: %s", user_id)
         await ws_manager.send_personal_message_json(
             {"type": "auth_ok", "message": "认证成功"},
             websocket,
