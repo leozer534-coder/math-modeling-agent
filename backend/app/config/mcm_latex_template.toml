@@ -1,0 +1,540 @@
+# MCM/ICM LaTeX Template - Writer Agent Writing Guidelines
+# When format_output = LaTeX and comp_template = AMERICAN, this template is used.
+# All sections must output pure LaTeX source code (no Markdown).
+
+firstPage = """
+% Output pure LaTeX for the Summary Sheet (Title + Abstract + Keywords)
+
+Requirements:
+- Title: Choose a concise, descriptive title based on the full paper, 10-15 words.
+  Output as: \\title{Your Title Here}
+
+- Abstract (Summary): Write inside \\begin{abstract} ... \\end{abstract}
+  First paragraph: Background and Significance (~200 words)
+  Each problem should be written as a separate paragraph:
+  For Problem X:
+  1. The mathematical nature of the problem
+  2. Which models were used (baseline + improved + innovative)
+  3. How the model was constructed
+  4. What results were obtained (specific numerical values)
+  5. Improvement over baseline methods
+  Each paragraph ~250 words
+
+  Final paragraph: Summarize all work (~200 words)
+
+- Keywords: Output as: \\textbf{Keywords:} keyword1, keyword2, keyword3, keyword4, keyword5
+
+Example output format:
+\\title{An Optimized Multi-Objective Agricultural Planning Model Using Harris Hawks Algorithm}
+
+\\begin{abstract}
+This paper addresses the agricultural planning optimization problem...
+
+For Problem 1, we formulate a multi-objective optimization model...
+
+\\textbf{Keywords:} HHO, MOHHO, Genetic Algorithm, Monte Carlo Simulation, Multi-Objective Optimization
+\\end{abstract}
+
+Based on the following problem statement and model solutions, complete the Title, Abstract, and Keywords.
+
+{问题}
+{模型的建立与求解}
+"""
+
+RepeatQues = """
+% Output pure LaTeX for Introduction section
+
+\\section{Introduction}
+\\subsection{Problem Background}
+Research relevant literature and combine with the background information given in the problem statement.
+Requirements:
+- Cite 3-5 relevant references using \\upcite{N} format
+- Explain the practical application value
+- Progress from macro to micro
+- Discuss limitations of existing approaches
+Format: 3-4 paragraphs, ~500 words
+
+\\subsection{Restatement of the Problem}
+Reference template:
+Based on the information above, this paper establishes mathematical models to address the following problems:
+Use \\begin{itemize} ... \\end{itemize} for listing each problem.
+- Restate each problem in your own words
+- Clarify the mathematical nature and solution objective
+- Use 2-3 sentences per problem
+
+\\subsection{Our Approach}
+Provide a brief overview of the methodology pipeline:
+- High-level description of the modeling framework
+- Key innovations in the approach
+- A brief roadmap of the paper structure
+~200 words
+
+Example LaTeX structure:
+\\section{Introduction}
+\\subsection{Problem Background}
+The problem of resource allocation has been extensively studied in operations research\\upcite{1}...
+
+\\subsection{Restatement of the Problem}
+Based on the above analysis, this paper aims to solve the following problems:
+\\begin{itemize}
+    \\setlength{\\parsep}{0ex}
+    \\setlength{\\topsep}{2ex}
+    \\setlength{\\itemsep}{1ex}
+    \\item \\textbf{Problem 1:} Determine the optimal allocation strategy...
+    \\item \\textbf{Problem 2:} Evaluate the sensitivity of...
+\\end{itemize}
+
+\\subsection{Our Approach}
+This paper proposes a three-layer modeling framework...
+
+**Based on the problem statement below, write the Introduction in LaTeX format.**
+
+{题目}
+"""
+
+analysisQues = """
+% Output pure LaTeX for Problem Analysis section
+
+\\section{Problem Analysis}
+For each problem, write a subsection (\\subsection{Analysis of Problem N}) with 2-3 paragraphs:
+
+1. Mathematical nature analysis (optimization/prediction/classification/evaluation)
+2. Data characteristics analysis (scale, dimensions, missing values, distribution)
+3. Modeling approach overview: baseline model, improved model, and innovative model with selection rationale
+4. Solution strategy and expected objectives
+Each problem ~400 words
+
+Example LaTeX structure:
+\\subsection{Analysis of Problem 1}
+This problem requires us to establish a mathematical model to find the optimal solution given certain data and constraints. By analyzing the mathematical structure, we find it is essentially a constrained multi-objective optimization problem...
+
+We select linear programming as the baseline model (a classical and widely-used approach), build upon it with mixed-integer programming (addressing the limitations of LP), and innovatively propose a hybrid genetic algorithm method...
+
+Write analysis for each problem following this pattern.
+
+{模型的建立与求解}
+{题目}
+"""
+
+modelAssumption = """
+% Output pure LaTeX for Assumptions section
+
+\\section{Assumptions and Justifications}
+Write 5-7 assumptions using the following LaTeX format:
+
+\\begin{enumerate}[\\bfseries \\textit{Assumption} 1:]
+    \\item \\textbf{We assume that the data used in this paper is authentic and reliable.}\\\\
+    \\textbf{\\textit{Explanation:}} The data originates from official statistics and has undergone preliminary cleaning.
+    \\item \\textbf{We assume that no major external factors significantly affect the system.}\\\\
+    \\textbf{\\textit{Explanation:}} Within short-term periods, environments typically remain stable.
+\\end{enumerate}
+
+Note: Assumptions must be closely related to the specific problem. Avoid overly generic assumptions.
+
+{模型的建立与求解}
+{题目}
+"""
+
+symbol = """
+% Output pure LaTeX for Notations section
+
+\\section{Notations and Data Preprocessing}
+\\subsection{Notations}
+
+Use the following LaTeX table format:
+Some important mathematical notations used in this paper are listed in \\Cref{tb:notations}.
+
+\\begin{table}[H]
+\\begin{center}
+\\caption{Notations used in this paper}\\label{tb:notations}
+\\begin{tabular}{c c c}
+\\toprule[2pt]
+\\multicolumn{1}{m{1.5cm}}{\\centering \\textbf{Symbol}}
+&\\multicolumn{1}{m{12.5cm}}{\\centering\\textbf{Description}}
+&\\multicolumn{1}{m{1cm}}{\\centering \\textbf{Units}}\\\\
+\\midrule
+$x_i$ & Decision variable for resource $i$ & - \\\\
+$y_j$ & Output quantity for product $j$ & tons \\\\
+$c_{ij}$ & Cost coefficient & USD \\\\
+\\bottomrule[2pt]
+\\end{tabular}
+\\end{center}
+\\end{table}
+
+Based on the model solutions below, provide a table of symbol notations in LaTeX format.
+
+{模型的建立与求解}
+"""
+
+eda = """
+% Output pure LaTeX for Data Overview and Preprocessing subsection
+
+\\subsection{Data Overview and Preprocessing}
+Requirements:
+- Basic information about the dataset (sample size, number of features, data types)
+- Statistical characteristics of key variables (mean, std, min/max, distribution shape)
+- Data quality analysis (missing value handling, outlier detection)
+- Data visualization description (reference charts using \\Cref{fig:xxx} format)
+- Specific steps and effects of data preprocessing
+~400 words, must reference charts
+
+Use LaTeX figure environment for chart references:
+\\begin{figure}[H]
+    \\centering
+    \\includegraphics[width=.80\\textwidth]{filename.png}
+    \\caption{Description of the figure}
+    \\label{fig:label_name}
+\\end{figure}
+"""
+
+ques1 = """Template and requirements (output pure LaTeX):
+% Model Development and Solution for Problem 1
+
+\\section{Model Development and Solution}
+\\subsection{Model for Problem 1}
+
+\\subsubsection{Problem Analysis and Variable Definition}
+- Clarify the mathematical nature (optimization/prediction/classification/evaluation)
+- Define decision variables, parameters, and constraints
+- Formulate the objective function using LaTeX equation environment:
+\\begin{equation}
+    \\min_{x} f(x) = \\sum_{i=1}^{n} c_i x_i
+    \\label{eq:objective1}
+\\end{equation}
+~300 words, must include complete mathematical formulas
+
+\\subsubsection{Model Formulation}
+- Present complete mathematical model (objective function + constraints)
+- Use align environment for multi-line equations:
+\\begin{align}
+    \\min \\quad & f(x) = \\sum_{i=1}^{n} c_i x_i \\label{eq:model1_obj} \\\\
+    \\text{s.t.} \\quad & \\sum_{j=1}^{m} a_{ij} x_j \\leq b_i, \\quad i = 1,2,\\ldots,p \\label{eq:model1_const1} \\\\
+    & x_j \\geq 0, \\quad j = 1,2,\\ldots,m \\label{eq:model1_const2}
+\\end{align}
+- Explain theoretical basis and derivation process
+- If multiple models: present baseline, improved, and innovative models separately
+~500 words
+
+\\subsubsection{Algorithm Design and Solution}
+- Describe core steps of the solution algorithm (use algorithm environment if needed):
+\\begin{algorithm}
+\\caption{Algorithm Name}
+\\begin{algorithmic}
+\\STATE Initialize parameters
+\\WHILE{convergence criterion not met}
+    \\STATE Update solution
+\\ENDWHILE
+\\RETURN optimal solution
+\\end{algorithmic}
+\\end{algorithm}
+~400 words
+
+\\subsubsection{Results Analysis and Visualization}
+- Present specific numerical results using tables:
+\\begin{table}[H]
+\\centering
+\\caption{Results of Problem 1}
+\\begin{tabular}{lccc}
+\\toprule
+Model & R² & RMSE & MAE \\\\
+\\midrule
+Baseline & 0.85 & 0.123 & 0.098 \\\\
+Improved & 0.92 & 0.087 & 0.065 \\\\
+Innovative & 0.95 & 0.054 & 0.042 \\\\
+\\bottomrule
+\\end{tabular}
+\\end{table}
+- Reference code-generated charts using \\Cref{fig:xxx}
+~400 words
+
+\\subsubsection{Model Comparison and Validation}
+- Performance comparison: baseline vs. improved vs. innovative
+- Present in tabular format with metrics
+~200 words
+
+Total ~1800 words
+"""
+
+ques2 = """Reference template (output pure LaTeX):
+\\subsection{Model for Problem 2}
+
+\\subsubsection{Problem Analysis and Variable Definition}
+- Clarify mathematical nature, define decision variables, parameters, constraints
+- Use \\begin{equation} for formulas
+- Explain connection with Problem 1
+~300 words
+
+\\subsubsection{Model Formulation}
+- Complete mathematical model using align environment
+- Present baseline, improved, and innovative models
+~500 words
+
+\\subsubsection{Algorithm Design and Solution}
+- Core steps, parameter selection rationale
+~400 words
+
+\\subsubsection{Results Analysis and Visualization}
+- Numerical results in tables, reference charts with \\Cref
+~400 words
+
+\\subsubsection{Model Comparison and Validation}
+- Performance comparison in tabular format
+~200 words
+
+Total ~1800 words
+"""
+
+ques3 = """Reference template (output pure LaTeX):
+\\subsection{Model for Problem 3}
+
+\\subsubsection{Problem Analysis and Variable Definition}
+~300 words, include equations
+
+\\subsubsection{Model Formulation}
+~500 words, use align environment
+
+\\subsubsection{Algorithm Design and Solution}
+~400 words
+
+\\subsubsection{Results Analysis and Visualization}
+~400 words, include tables and figure references
+
+\\subsubsection{Model Comparison and Validation}
+~200 words, include comparison table
+
+Total ~1800 words
+"""
+
+ques4 = """Reference template (output pure LaTeX):
+\\subsection{Model for Problem 4}
+
+\\subsubsection{Problem Analysis and Variable Definition}
+~300 words, include equations
+
+\\subsubsection{Model Formulation}
+~500 words
+
+\\subsubsection{Algorithm Design and Solution}
+~400 words
+
+\\subsubsection{Results Analysis and Visualization}
+~400 words
+
+\\subsubsection{Model Comparison and Validation}
+~200 words
+
+Total ~1800 words
+"""
+
+ques5 = """Reference template (output pure LaTeX):
+\\subsection{Model for Problem 5}
+
+\\subsubsection{Problem Analysis and Variable Definition}
+~300 words
+
+\\subsubsection{Model Formulation}
+~500 words
+
+\\subsubsection{Algorithm Design and Solution}
+~400 words
+
+\\subsubsection{Results Analysis and Visualization}
+~400 words
+
+\\subsubsection{Model Comparison and Validation}
+~200 words
+
+Total ~1800 words
+"""
+
+ques6 = """Reference template (output pure LaTeX):
+\\subsection{Model for Problem 6}
+
+\\subsubsection{Problem Analysis and Variable Definition}
+~300 words
+
+\\subsubsection{Model Formulation}
+~500 words
+
+\\subsubsection{Algorithm Design and Solution}
+~400 words
+
+\\subsubsection{Results Analysis and Visualization}
+~400 words
+
+\\subsubsection{Model Comparison and Validation}
+~200 words
+
+Total ~1800 words
+"""
+
+sensitivity_analysis = """Reference template (output pure LaTeX):
+\\section{Sensitivity Analysis and Model Validation}
+\\subsection{Sensitivity Analysis}
+Perform sensitivity analysis on key parameters:
+- Clearly identify parameters and rationale for selection
+- Parameter variation range (e.g., ±10%, ±20%, ±50%)
+- Impact of parameter changes on results (specific numerical values)
+- Reference sensitivity analysis charts using \\Cref{fig:sensitivity_xxx}
+- Use subfigure environment for multiple sensitivity plots:
+\\begin{figure}[H]
+    \\centering
+    \\begin{subfigure}[t]{0.48\\linewidth}
+        \\centering
+        \\includegraphics[width=\\linewidth]{sensitivity_alpha.png}
+        \\caption{Sensitivity of Parameter $\\alpha$}
+    \\end{subfigure}
+    \\hspace{0.02\\linewidth}
+    \\begin{subfigure}[t]{0.48\\linewidth}
+        \\centering
+        \\includegraphics[width=\\linewidth]{sensitivity_beta.png}
+        \\caption{Sensitivity of Parameter $\\beta$}
+    \\end{subfigure}
+    \\caption{Sensitivity Analysis Results}
+    \\label{fig:sensitivity_analysis}
+\\end{figure}
+~600 words
+
+\\subsection{Model Validation}
+- Cross-validation or holdout validation results
+- Comparison with known solutions or benchmark datasets
+- Error analysis and confidence intervals
+~300 words
+"""
+
+model_comparison = """Reference template (output pure LaTeX):
+\\subsection{Multi-Model Comparative Analysis}
+
+For each problem, compare baseline, improved, and innovative models:
+- Model name and core methodology
+- Key evaluation metrics in table format:
+\\begin{table}[H]
+\\centering
+\\caption{Model Comparison for Problem N}
+\\begin{tabular}{lcccc}
+\\toprule
+Model & R² & RMSE & MAE & Rank \\\\
+\\midrule
+Baseline & 0.85 & 0.123 & 0.098 & 3 \\\\
+Improved & 0.92 & 0.087 & 0.065 & 2 \\\\
+Innovative & 0.95 & 0.054 & 0.042 & 1 \\\\
+\\bottomrule
+\\end{tabular}
+\\end{table}
+- Analyze improvement percentages
+- Discuss applicable scenarios and limitations
+~400 words per problem
+
+{comparison_data}
+
+Overall Model Ranking and Analysis:
+- Overall ranking based on all problems
+- Common strengths of top-ranked models
+- Final recommended modeling strategy
+~300 words
+"""
+
+innovation_benchmark = """Reference template (output pure LaTeX):
+\\section{Strengths and Weaknesses}
+\\subsection{Strengths}
+List 4-5 strengths using \\begin{itemize}:
+\\begin{itemize}
+    \\item \\textbf{Strength 1:} Description with data support...
+    \\item \\textbf{Strength 2:} Description...
+\\end{itemize}
+~300 words
+
+\\subsection{Weaknesses}
+List 2-3 weaknesses:
+\\begin{itemize}
+    \\item \\textbf{Weakness 1:} Description and cause...
+\\end{itemize}
+~150 words
+
+\\subsection{Future Improvements}
+- Improvement directions for each weakness
+- Model generalization potential
+- Future research directions
+~200 words
+
+Total ~650 words
+"""
+
+judge = """Reference template (output pure LaTeX):
+\\section{Conclusions}
+\\subsection{Summary of Results}
+Systematically summarize all work:
+- 2-3 sentences per problem summarizing core conclusions
+- Include key numerical results (optimal values, accuracy, improvement margins)
+- Emphasize logical relationships between problems
+~400 words
+
+\\subsection{Model Applications and Generalization}
+- Specify real-world application domains
+- Adjustments needed for generalization
+- Recommendations for decision makers
+~200 words
+"""
+
+conclusion = """Reference template (output pure LaTeX):
+% Use the letter environment for the Memo
+\\begin{letter}{Memo to Decision Maker}
+\\textbf{To:} [Decision Maker / Organization]\\\\
+\\textbf{From:} Team \\#XXXXX\\\\
+\\textbf{Date:} \\today\\\\
+\\textbf{Subject:} Key Findings and Recommendations\\\\
+
+\\noindent\\rule{\\linewidth}{0.4pt}
+
+Write a professional memo summarizing key findings:
+- Brief context statement (1-2 sentences)
+- 3-5 key findings with supporting data
+- Actionable recommendations
+- Address potential risks or limitations
+- Forward-looking statement
+~400-500 words, use professional non-technical language
+\\end{letter}
+"""
+
+# ============= Coder Prompt Templates =============
+[coder_prompts]
+eda = """
+Based on the solution approach provided by the modeler: {solution}
+Perform EDA analysis (data cleaning, visualization) on the data in the current directory. Save cleaned data to the current directory. **No complex models needed.**
+"""
+
+ques_template = """
+Based on the solution approach provided by the modeler: {solution}
+Complete the following problem: {question}
+"""
+
+sensitivity_analysis = """
+Based on the solution approach provided by the modeler: {solution}
+Perform sensitivity analysis.
+"""
+
+# ============= Writer Prompt Templates =============
+[writer_prompts]
+firstPage = """Problem background: {background}. No code needed. Based on the model solution information: {model_build_solve}, write the Title, Summary, and Keywords in LaTeX format according to this template: {template}"""
+
+RepeatQues = """Problem background: {background}. No code needed. Based on the model solution information: {model_build_solve}, write the Introduction section in LaTeX format according to this template: {template}"""
+
+analysisQues = """Problem background: {background}. No code needed. Based on the model solution information: {model_build_solve}, write the Problem Analysis section in LaTeX format according to this template: {template}"""
+
+modelAssumption = """Problem background: {background}. No code needed. Based on the model solution information: {model_build_solve}, write the Assumptions section in LaTeX format according to this template: {template}"""
+
+symbol = """No code needed. Based on the model solution information: {model_build_solve}, write the Notations section in LaTeX format according to this template: {template}"""
+
+innovation_benchmark = """No code needed. Based on the model solution information: {model_build_solve}, write the Strengths and Weaknesses section in LaTeX format according to this template: {template}"""
+
+judge = """No code needed. Based on the model solution information: {model_build_solve}, write the Conclusions section in LaTeX format according to this template: {template}"""
+
+conclusion = """Problem background: {background}. No code needed. Based on the model solution information: {model_build_solve}, write the Memo/Letter in LaTeX format according to this template: {template}"""
+
+eda = """Problem background: {background}. No code needed. Coder results: {coder_response}, {code_output}. Write the Data Preprocessing section in LaTeX format according to this template: {template}"""
+
+ques_template = """Problem background: {background}. No code needed. Coder results: {coder_response}, {code_output}. Write in LaTeX format according to this template: {template}"""
+
+sensitivity_analysis = """Problem background: {background}. No code needed. Coder results: {coder_response}, {code_output}. Write in LaTeX format according to this template: {template}"""
+
+model_comparison = """No code needed. Based on the model solution information: {model_build_solve}, write the Multi-Model Comparative Analysis section in LaTeX format according to this template: {template}"""

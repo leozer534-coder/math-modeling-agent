@@ -13,7 +13,7 @@ from app.tools.notebook_serializer import NotebookSerializer
 from app.utils.log_util import logger
 from app.config.setting import settings
 import json
-from app.tools.base_interpreter import BaseCodeInterpreter
+from app.tools.base_interpreter import BaseCodeInterpreter, MATPLOTLIB_SETUP_CODE
 
 
 class E2BCodeInterpreter(BaseCodeInterpreter):
@@ -25,6 +25,7 @@ class E2BCodeInterpreter(BaseCodeInterpreter):
     ):
         super().__init__(task_id, work_dir, notebook_serializer)
         self.sbx = None
+        self._seen_images: set[str] = set()
 
     @classmethod
     async def create(
@@ -47,21 +48,21 @@ class E2BCodeInterpreter(BaseCodeInterpreter):
             await self._pre_execute_code()
             await self._upload_all_files()
         except Exception as e:
-            logger.error(f"初始化沙箱环境失败: {str(e)}")
+            logger.error("初始化沙箱环境失败: %s", e)
             raise
 
     async def _upload_all_files(self):
         """上传工作目录中的所有文件到沙箱"""
         try:
-            logger.info(f"开始上传文件，工作目录: {self.work_dir}")
+            logger.info("开始上传文件，工作目录: %s", self.work_dir)
             if not os.path.exists(self.work_dir):
-                logger.error(f"工作目录不存在: {self.work_dir}")
+                logger.error("工作目录不存在: %s", self.work_dir)
                 raise FileNotFoundError(f"工作目录不存在: {self.work_dir}")
 
             files = [
                 f for f in os.listdir(self.work_dir) if f.endswith((".csv", ".xlsx"))
             ]
-            logger.info(f"工作目录中的文件列表: {files}")
+            logger.info("工作目录中的文件列表: %s", files)
 
             for file in files:
                 file_path = os.path.join(self.work_dir, file)
@@ -71,23 +72,32 @@ class E2BCodeInterpreter(BaseCodeInterpreter):
                             content = f.read()
                             # 使用官方推荐的 files.write 方法
                             await self.sbx.files.write(f"/home/user/{file}", content)
-                            logger.info(f"成功上传文件到沙箱: {file}")
+                            logger.info("成功上传文件到沙箱: %s", file)
                     except Exception as e:
-                        logger.error(f"上传文件 {file} 失败: {str(e)}")
+                        logger.error("上传文件 %s 失败: %s", file, e)
                         raise
 
         except Exception as e:
-            logger.error(f"文件上传过程失败: {str(e)}")
+            logger.error("文件上传过程失败: %s", e)
             raise
 
     async def _pre_execute_code(self):
-        init_code = (
-            "import matplotlib.pyplot as plt\n"
-            # "plt.rcParams['font.sans-serif'] = ['DejaVu Sans', 'Arial Unicode MS']\n"
-            # "plt.rcParams['axes.unicode_minus'] = False\n"
-            # "plt.rcParams['font.family'] = 'sans-serif'\n"
+        """执行沙箱初始化代码：配置 matplotlib 中文字体和随机种子。"""
+        # 使用共享的跨平台 matplotlib 中文字体配置
+        await self.execute_code(MATPLOTLIB_SETUP_CODE)
+
+        # 随机种子配置（默认值，可被后续代码覆盖）
+        seed_code = (
+            "try:\n"
+            "    import numpy as np\n"
+            "    np.random.seed(42)\n"
+            "    import random\n"
+            "    random.seed(42)\n"
+            "    print('随机种子已设置: 42')\n"
+            "except Exception as _e:\n"
+            "    print(f'随机种子设置跳过: {_e}')\n"
         )
-        await self.execute_code(init_code)
+        await self.execute_code(seed_code)
 
     async def execute_code(self, code: str) -> tuple[str, bool, str]:
         """执行代码并返回结果"""
@@ -95,7 +105,11 @@ class E2BCodeInterpreter(BaseCodeInterpreter):
         if not self.sbx:
             raise RuntimeError("沙箱环境未初始化")
 
-        logger.info(f"执行代码: {code}")
+        # 代码安全审查：在执行前检测危险模式
+        self._sanitize_code(code)
+
+        logger.info("执行代码 (%d 字符)", len(code))
+        logger.debug("执行代码内容: %s", code)
         self.notebook_serializer.add_code_cell_to_notebook(code)
 
         text_to_gpt: list[str] = []
@@ -122,7 +136,7 @@ class E2BCodeInterpreter(BaseCodeInterpreter):
             error_occurred = True
             error_message = f"Error: {execution.error.name}: {execution.error.value}\n{execution.error.traceback}"
             error_message = self._truncate_text(error_message)
-            logger.error(f"执行错误: {error_message}")
+            logger.error("执行错误: %s", error_message)
             text_to_gpt.append(self.delete_color_control_char(error_message))
             content_to_display.append(
                 ErrorModel(
@@ -137,7 +151,7 @@ class E2BCodeInterpreter(BaseCodeInterpreter):
             if execution.logs.stdout:
                 stdout_str = "\n".join(execution.logs.stdout)
                 stdout_str = self._truncate_text(stdout_str)
-                logger.info(f"标准输出: {stdout_str}")
+                logger.info("标准输出: %s", stdout_str)
                 text_to_gpt.append(stdout_str)
                 content_to_display.append(
                     StdOutModel(msg="\n".join(execution.logs.stdout))
@@ -147,7 +161,7 @@ class E2BCodeInterpreter(BaseCodeInterpreter):
             if execution.logs.stderr:
                 stderr_str = "\n".join(execution.logs.stderr)
                 stderr_str = self._truncate_text(stderr_str)
-                logger.warning(f"标准错误: {stderr_str}")
+                logger.warning("标准错误: %s", stderr_str)
                 text_to_gpt.append(stderr_str)
                 content_to_display.append(
                     StdErrModel(msg="\n".join(execution.logs.stderr))
@@ -243,14 +257,7 @@ class E2BCodeInterpreter(BaseCodeInterpreter):
         # 限制返回的文本总长度
 
         for item in content_to_display:
-            if isinstance(item, dict):
-                if item.get("type") in ["stdout", "stderr", "error"]:
-                    text_to_gpt.append(
-                        self._truncate_text(
-                            item.get("content") or item.get("value") or ""
-                        )
-                    )
-            elif isinstance(item, ResultModel):
+            if isinstance(item, ResultModel):
                 if item.format in ["text", "html", "markdown", "json"]:
                     text_to_gpt.append(
                         self._truncate_text(f"[{item.format}]\n{item.msg}")
@@ -260,16 +267,17 @@ class E2BCodeInterpreter(BaseCodeInterpreter):
                         f"[{item.format} 图片已生成，内容为 base64，未展示]"
                     )
 
-        logger.info(f"text_to_gpt: {text_to_gpt}")
+        logger.debug("text_to_gpt: %s", text_to_gpt)
 
         combined_text = "\n".join(text_to_gpt)
+        combined_text = self._truncate_combined_output(combined_text)
 
         # 在代码执行完成后，立即同步文件
         try:
             await self.download_all_files_from_sandbox()
             logger.info("文件同步完成")
         except Exception as e:
-            logger.error(f"文件同步失败: {str(e)}")
+            logger.error("文件同步失败: %s", e)
 
         # 保存到分段内容
         ## TODO: Base64 等图像需要优化
@@ -282,7 +290,7 @@ class E2BCodeInterpreter(BaseCodeInterpreter):
         )
 
     async def get_created_images(self, section: str) -> list[str]:
-        """获取当前 section 创建的图片列表"""
+        """获取当前 section 创建的图片列表（仅返回本次新增，不重复）"""
         if not self.sbx:
             logger.warning("沙箱环境未初始化")
             return []
@@ -294,31 +302,38 @@ class E2BCodeInterpreter(BaseCodeInterpreter):
                     self.add_section(section)
                     self.section_output[section]["images"].append(file.name)
 
-            self.created_images = list(
-                set(self.section_output[section]["images"]) - set(self.created_images)
-            )
-            logger.info(f"{section}-获取创建的图片列表: {self.created_images}")
-            return self.created_images
+            all_images = set(self.section_output[section].get("images", []))
+            new_images = list(all_images - self._seen_images)
+            self._seen_images.update(new_images)
+            self.created_images = new_images
+            logger.info("%s-获取创建的图片列表: %s", section, new_images)
+            return new_images
         except Exception as e:
-            logger.error(f"获取创建的图片列表失败: {str(e)}")
+            logger.error("获取创建的图片列表失败: %s", e)
             return []
 
     async def cleanup(self):
         """清理资源并关闭沙箱"""
+        if not self.sbx:
+            return
         try:
-            if self.sbx:
-                if await self.sbx.is_running():
-                    try:
-                        await self.download_all_files_from_sandbox()
-                    except Exception as e:
-                        logger.error(f"下载文件失败: {str(e)}")
-                    finally:
-                        await self.sbx.kill()
-                        logger.info("成功关闭沙箱环境")
-                else:
-                    logger.warning("沙箱已经关闭，跳过清理步骤")
-        except Exception as e:
-            logger.error(f"清理沙箱环境失败: {str(e)}")
+            try:
+                running = await self.sbx.is_running()
+            except Exception as e:
+                logger.warning("检查沙箱状态失败: %s，仍将尝试清理", e)
+                running = True  # 假设还在运行，确保尝试 kill
+
+            if running:
+                try:
+                    await self.download_all_files_from_sandbox()
+                except Exception as e:
+                    logger.error("下载沙箱文件失败: %s", e)
+        finally:
+            try:
+                await self.sbx.kill()
+                logger.info("E2B 沙箱已关闭")
+            except Exception as e:
+                logger.error("关闭 E2B 沙箱失败: %s", e)
             # 这里可以选择不抛出异常，因为这是清理步骤
 
     async def download_all_files_from_sandbox(self) -> None:
@@ -326,7 +341,7 @@ class E2BCodeInterpreter(BaseCodeInterpreter):
         try:
             # 获取沙箱中的文件列表
             sandbox_files = await self.sbx.files.list("/home/user")
-            sandbox_files_dict = {f.name: f for f in sandbox_files}
+            _sandbox_files_dict = {f.name: f for f in sandbox_files}
 
             # 获取本地文件列表
             local_files = set()
@@ -359,13 +374,13 @@ class E2BCodeInterpreter(BaseCodeInterpreter):
                         # 写入文件
                         with open(local_path, "wb") as f:
                             f.write(content)
-                        logger.info(f"同步文件: {file.name}")
+                        logger.info("同步文件: %s", file.name)
 
                 except Exception as e:
-                    logger.error(f"同步文件 {file.name} 失败: {str(e)}")
+                    logger.error("同步文件 %s 失败: %s", file.name, e)
                     continue
 
             logger.info("文件同步完成")
 
         except Exception as e:
-            logger.error(f"文件同步失败: {str(e)}")
+            logger.error("文件同步失败: %s", e)

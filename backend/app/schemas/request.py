@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from app.schemas.enums import CompTemplate, FormatOutPut
 
 
@@ -8,13 +8,9 @@ class ExampleRequest(BaseModel):
 
 
 class Problem(BaseModel):
+    model_config = ConfigDict(use_enum_values=True)
+
     task_id: str
     ques_all: str = ""
     comp_template: CompTemplate = CompTemplate.CHINA
     format_output: FormatOutPut = FormatOutPut.Markdown
-
-    def model_dump(self, **kwargs):
-        data = super().model_dump(**kwargs)
-        data["comp_template"] = self.comp_template.value
-        data["format_output"] = self.format_output.value
-        return data

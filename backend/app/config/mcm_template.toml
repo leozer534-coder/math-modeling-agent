@@ -1,0 +1,451 @@
+firstPage = """
+# Title: Choose a concise and descriptive title based on the full paper
+Requirements: The title should include the core methodology and research subject, 10-15 words recommended.
+Example: An Optimized Multi-Objective Agricultural Planning Model Using Harris Hawks Algorithm
+
+Summary
+First paragraph: Background and Significance
+Briefly describe the research context, practical significance, and the purpose of this study.
+Approximately 200 words
+
+Each problem should be written as a separate paragraph '\n', do not use bullet points.
+For Problem X, based on the problem, describe:
+1. The mathematical nature of the problem (e.g., optimization, prediction, classification)
+2. Which models were used (baseline model + improved/innovative model)
+3. How the model was constructed (key modeling approach)
+4. What work was done (data processing, feature engineering, parameter tuning, etc.)
+5. What results were obtained (specific numerical values: accuracy, error, optimal values, etc.)
+6. Improvement over baseline methods (percentage or absolute value comparison)
+Each paragraph approximately 250 words
+
+Final paragraph: Summarize all work, including sensitivity analysis methodology and conclusions, model robustness validation results, key innovations and their practical value.
+Approximately 200 words
+
+Keywords: Core models and methods used, 5-6 keywords, no numbering, separated by spaces
+Example: HHO  MOHHO  Genetic Algorithm  Monte Carlo Simulation  Multi-Objective Optimization  Sensitivity Analysis
+
+Based on the following problem statement and model solutions, complete the Title, Summary, and Keywords according to the template and requirements above.
+
+{问题}
+{模型的建立与求解}
+"""
+RepeatQues = """
+# 1 Introduction
+## 1.1 Problem Background
+Research relevant literature and combine with the background information given in the problem statement to elaborate on the current state of the research field, existing challenges, and the necessity of this study.
+Requirements:
+- Cite 3-5 relevant references to support the importance of the background
+- Explain the practical application value of this problem
+- Progress from macro to micro, gradually focusing on the specific problem studied in this paper
+- Discuss the limitations of existing approaches and the gap this paper aims to fill
+Format: 3-4 paragraphs of coherent narrative
+Approximately 500 words
+
+## 1.2 Problem Restatement
+Reference template:
+Based on the information above, this paper establishes mathematical models to address the following problems:
+- Restate each problem in your own words (do not simply copy the original problem text)
+- Clarify the mathematical nature and solution objective of each problem
+- Identify the progressive relationship or logical connections between problems
+Use bullet points, 2-3 sentences per problem
+
+## 1.3 Our Approach
+Provide a brief overview of the methodology pipeline used in this paper:
+- High-level description of the modeling framework
+- Key innovations in the approach
+- A brief roadmap of the paper structure
+Approximately 200 words
+
+**Based on the problem statement below, complete the Introduction sections according to the template and requirements above.**
+
+{题目}
+"""
+analysisQues = """
+# 2 Problem Analysis
+## 2.1 Analysis of Problem 1
+Requirements (2-3 paragraphs):
+1. Mathematical nature analysis (what type of problem: optimization/prediction/classification/evaluation)
+2. Data characteristics analysis (data scale, dimensions, missing values, distribution features)
+3. Modeling approach overview: clearly identify the baseline model (classical method), improved model (optimization on baseline), and innovative model (new method proposed in this paper) with selection rationale and differences
+4. Solution strategy and expected objectives
+Approximately 400 words
+
+Reference template:
+This problem requires us to establish a mathematical model to find the optimal solution given certain data and constraints. By analyzing the mathematical structure of the problem, we find it is essentially a constrained multi-objective optimization problem. The dataset contains N features and M records, and preliminary analysis reveals the data exhibits XX distribution characteristics.
+
+We select XX as the baseline model (a classical and widely-used approach), build upon it with YY improvement (addressing the limitations of XX), and innovatively propose ZZ method (a novel approach combining domain knowledge). These three models will be evaluated across three dimensions: accuracy, efficiency, and robustness.
+
+Analyze each problem in this manner:
+## 2.2 Analysis of Problem 2
+
+
+Based on the model solutions and problem statement below, complete the analysis for each problem according to the template and requirements above.
+
+{模型的建立与求解}
+{题目}
+  """
+modelAssumption = """
+# 3 Assumptions and Justifications
+Write 5-7 assumptions, each assumption must include: Assumption content + Justification (why this assumption is made)
+Format examples:
+(1) **Data Validity Assumption**: We assume all data used in this paper is authentic and reliable, accurately reflecting real-world conditions. Justification: The data originates from official statistics or experimental observations and has undergone preliminary cleaning and validation.
+(2) **Market Stability Assumption**: We assume no major natural disasters, policy changes, or other external factors significantly affect the system during the study period. Justification: Within short-term periods (e.g., 3-5 years), market environments typically remain relatively stable.
+(3) **Model Independence Assumption**: We assume each sub-problem's model can be solved independently. Justification: Although the problems are interconnected, their modeling objectives and constraints are relatively independent.
+(4) **Continuity Assumption**: We assume relevant variables are continuous and differentiable within the study range. Justification: In practical applications, most economic and physical quantities change continuously.
+(5) **Linear Approximation Assumption**: We assume nonlinear relationships can be approximated by linear models within local ranges. Justification: Taylor expansion theory supports the validity of local linearization.
+
+Note: Assumptions must be closely related to the specific problem. Avoid overly generic assumptions.
+
+Based on the model solutions and problem statement below, complete the Assumptions and Justifications section according to the template and requirements above.
+
+{模型的建立与求解}
+{题目}
+  """
+symbol = """
+# 4 Notations and Data Preprocessing
+## 4.1 Notations
+
+Reference template:
+| Symbol | Description | Unit |
+| ---- | ---- | ---- |
+| \\( x \\) | Decision variable | - |
+| \\( y \\) | Planting area | acres |
+| \\( z \\) | Expected sales volume | tons |
+| \\( c \\) | Planting cost | USD |
+| \\( p \\) | Selling price | USD/ton |
+| \\( r \\) | Risk coefficient | - |
+| \\( t \\) | Time (year) | year |
+
+Based on the model solutions below, provide a table of symbol notations.
+Note: Symbols should be rendered using markdown formula syntax.
+
+{模型的建立与求解}
+"""
+eda = """
+## 4.2 Data Overview and Preprocessing
+Requirements:
+- Basic information about the dataset (sample size, number of features, data types)
+- Statistical characteristics of key variables (mean, std, min/max, distribution shape)
+- Data quality analysis (missing value handling, outlier detection and treatment)
+- Data visualization description (reference EDA-generated charts such as distribution plots, correlation heatmaps, etc.)
+- Specific steps and effects of data preprocessing
+Approximately 400 words, must reference charts
+"""
+ques1 = """Template and requirements:
+# 5 Model Development and Solution
+## 5.1 Model for Problem 1
+
+### 5.1.1 Problem Analysis and Variable Definition
+- Clarify the mathematical nature of the problem (optimization/prediction/classification/evaluation)
+- Define decision variables, parameters, and constraints
+- Formulate the objective function in rigorous mathematical language
+Approximately 300 words, must include complete mathematical formulas
+
+### 5.1.2 Model Formulation
+- Present the complete mathematical form of the model (objective function + constraints)
+- Explain the theoretical basis and derivation process
+- If multiple models are involved (baseline + improved + innovative), present mathematical expressions for each
+- State the applicable conditions and assumptions of the model
+Approximately 500 words, must include complete mathematical formula derivations
+
+### 5.1.3 Algorithm Design and Solution
+- Describe the core steps of the solution algorithm (pseudocode or flowchart)
+- Explain the rationale for algorithm parameter selection (e.g., learning rate, population size, iteration count)
+- Describe convergence conditions and termination criteria
+Approximately 400 words
+
+### 5.1.4 Results Analysis and Visualization
+- Present specific numerical results (to appropriate significant figures)
+- Interpret results in terms of physical/economic/practical significance
+- Reference code-generated charts for analysis (trend plots, comparison charts, heatmaps, etc.)
+- Discuss whether results are reasonable and consistent with real-world expectations
+Approximately 400 words, must reference charts
+
+### 5.1.5 Model Comparison and Validation
+- Performance comparison: baseline model vs. improved model vs. innovative model
+- Provide comparison metrics (e.g., RMSE, MAE, accuracy, objective function value)
+- Present comparison results in tabular format
+- Analyze the magnitude and reasons for improvement
+Approximately 200 words, must include comparison table
+
+Total approximately 1800 words
+"""
+ques2 = """Reference template:
+## 5.2 Model for Problem 2
+
+### 5.2.1 Problem Analysis and Variable Definition
+- Clarify the mathematical nature of the problem, define decision variables, parameters, and constraints
+- Formulate the objective function in rigorous mathematical language
+- Explain the connection with and distinction from Problem 1
+Approximately 300 words, must include complete mathematical formulas
+
+### 5.2.2 Model Formulation
+- Present the complete mathematical form of the model (objective function + constraints)
+- Explain the theoretical basis and derivation process
+- Present mathematical expressions for baseline, improved, and innovative models respectively
+Approximately 500 words, must include complete mathematical formula derivations
+
+### 5.2.3 Algorithm Design and Solution
+- Describe the core steps of the solution algorithm
+- Explain the rationale for algorithm parameter selection
+- Describe convergence conditions and termination criteria
+Approximately 400 words
+
+### 5.2.4 Results Analysis and Visualization
+- Present specific numerical results
+- Interpret results in terms of practical significance, reference code-generated charts for analysis
+Approximately 400 words, must reference charts
+
+### 5.2.5 Model Comparison and Validation
+- Performance comparison: baseline vs. improved vs. innovative model, present in tabular format
+Approximately 200 words, must include comparison table
+
+Total approximately 1800 words
+"""
+ques3 = """Reference template:
+## 5.3 Model for Problem 3
+
+### 5.3.1 Problem Analysis and Variable Definition
+- Clarify the mathematical nature of the problem, define decision variables, parameters, and constraints
+- Formulate the objective function in rigorous mathematical language
+- Explain the connection with and progressive relationship to previous problems
+Approximately 300 words, must include complete mathematical formulas
+
+### 5.3.2 Model Formulation
+- Present the complete mathematical form of the model (objective function + constraints)
+- Explain the theoretical basis and derivation process
+- Present mathematical expressions for baseline, improved, and innovative models respectively
+Approximately 500 words, must include complete mathematical formula derivations
+
+### 5.3.3 Algorithm Design and Solution
+- Describe the core steps of the solution algorithm
+- Explain the rationale for algorithm parameter selection
+- Describe convergence conditions and termination criteria
+Approximately 400 words
+
+### 5.3.4 Results Analysis and Visualization
+- Present specific numerical results
+- Interpret results in terms of practical significance, reference code-generated charts for analysis
+Approximately 400 words, must reference charts
+
+### 5.3.5 Model Comparison and Validation
+- Performance comparison: baseline vs. improved vs. innovative model, present in tabular format
+Approximately 200 words, must include comparison table
+
+Total approximately 1800 words
+"""
+ques4 = """Reference template:
+## 5.4 Model for Problem 4
+
+### 5.4.1 Problem Analysis and Variable Definition
+- Clarify the mathematical nature of the problem, define decision variables, parameters, and constraints
+- Formulate the objective function in rigorous mathematical language
+Approximately 300 words, must include complete mathematical formulas
+
+### 5.4.2 Model Formulation
+- Present the complete mathematical form of the model (objective function + constraints)
+- Explain the theoretical basis and derivation process
+Approximately 500 words, must include complete mathematical formula derivations
+
+### 5.4.3 Algorithm Design and Solution
+- Describe the core steps of the solution algorithm and rationale for parameter selection
+Approximately 400 words
+
+### 5.4.4 Results Analysis and Visualization
+- Present specific numerical results, reference code-generated charts for analysis
+Approximately 400 words, must reference charts
+
+### 5.4.5 Model Comparison and Validation
+- Performance comparison: baseline vs. improved vs. innovative model, present in tabular format
+Approximately 200 words, must include comparison table
+
+Total approximately 1800 words
+"""
+ques5 = """Reference template:
+## 5.5 Model for Problem 5
+
+### 5.5.1 Problem Analysis and Variable Definition
+- Clarify the mathematical nature of the problem, define decision variables, parameters, and constraints
+Approximately 300 words, must include complete mathematical formulas
+
+### 5.5.2 Model Formulation
+- Present the complete mathematical form of the model, explain theoretical basis and derivation process
+Approximately 500 words, must include complete mathematical formula derivations
+
+### 5.5.3 Algorithm Design and Solution
+- Describe the core steps of the solution algorithm and rationale for parameter selection
+Approximately 400 words
+
+### 5.5.4 Results Analysis and Visualization
+- Present specific numerical results, reference code-generated charts for analysis
+Approximately 400 words, must reference charts
+
+### 5.5.5 Model Comparison and Validation
+- Performance comparison: baseline vs. improved vs. innovative model, present in tabular format
+Approximately 200 words, must include comparison table
+
+Total approximately 1800 words
+"""
+ques6 = """Reference template:
+## 5.6 Model for Problem 6
+
+### 5.6.1 Problem Analysis and Variable Definition
+- Clarify the mathematical nature of the problem, define decision variables, parameters, and constraints
+Approximately 300 words, must include complete mathematical formulas
+
+### 5.6.2 Model Formulation
+- Present the complete mathematical form of the model, explain theoretical basis and derivation process
+Approximately 500 words, must include complete mathematical formula derivations
+
+### 5.6.3 Algorithm Design and Solution
+- Describe the core steps of the solution algorithm and rationale for parameter selection
+Approximately 400 words
+
+### 5.6.4 Results Analysis and Visualization
+- Present specific numerical results, reference code-generated charts for analysis
+Approximately 400 words, must reference charts
+
+### 5.6.5 Model Comparison and Validation
+- Performance comparison: baseline vs. improved vs. innovative model, present in tabular format
+Approximately 200 words, must include comparison table
+
+Total approximately 1800 words
+"""
+sensitivity_analysis = """Reference template:
+# 6 Sensitivity Analysis and Model Validation
+## 6.1 Sensitivity Analysis
+Perform sensitivity analysis on key parameters in the model, requirements:
+- Clearly identify which parameters are selected for analysis and the rationale for selection
+- Describe the parameter variation range (e.g., ±10%, ±20%, ±50%)
+- Present the impact of parameter changes on results (specific numerical changes)
+- Reference sensitivity analysis charts (e.g., parameter-objective function curves, tornado diagrams)
+- Analyze model robustness: which parameters have large impact, which have small impact
+- Draw conclusions: whether the model has good stability
+Approximately 600 words, must include analysis charts and specific numerical values
+
+## 6.2 Model Validation
+- Cross-validation or holdout validation results
+- Comparison with known solutions or benchmark datasets
+- Error analysis and confidence intervals
+Approximately 300 words
+"""
+model_comparison = """Reference template:
+## 6.3 Multi-Model Comparative Analysis
+Conduct a systematic comparative analysis of the multiple models used for each problem:
+
+### Per-Problem Model Comparison
+For each problem, compare the baseline, improved, and innovative models across the following dimensions:
+- Model name and core methodology
+- Key evaluation metrics comparison (e.g., R², RMSE, MAE, Accuracy, F1, etc.)
+- Present each model's performance in tabular format
+- Analyze the improvement of enhanced and innovative models over the baseline (percentage)
+- Discuss the applicable scenarios and limitations of each model
+Approximately 400 words, each problem must include a comparison table
+
+{comparison_data}
+
+### Overall Model Ranking and Analysis
+- Provide an overall ranking of models based on performance across all problems
+- Analyze the common strengths of top-ranked models
+- Discuss the relationship between model selection and problem characteristics
+- Provide final recommended modeling strategy
+Approximately 300 words
+"""
+innovation_benchmark = """Reference template:
+# 7 Strengths and Weaknesses
+## 7.1 Strengths
+List 4-5 strengths, each strength must:
+- Be connected to specific work in this paper (not generic evaluations)
+- Have data support where possible for more convincing arguments
+- Highlight innovation sources and their specific contributions
+Approximately 300 words
+
+## 7.2 Weaknesses
+List 2-3 weaknesses, must be objective and honest:
+- Describe the specific manifestation of each weakness
+- Analyze the causes of each weakness
+Approximately 150 words
+
+## 7.3 Future Improvements
+- Propose specific improvement directions for each weakness
+- Discuss potential for model generalization to other domains or scenarios
+- Suggest possible extensions and future research directions
+Approximately 200 words
+
+Strengths should outnumber weaknesses. Total approximately 650 words.
+"""
+judge = """Reference template and requirements:
+# 8 Conclusions
+## 8.1 Summary of Results
+Systematically summarize all work, listing the main conclusions and key findings for each problem:
+- Use 2-3 sentences per problem to summarize core conclusions
+- Must include key numerical results (optimal values, accuracy, improvement margins, etc.)
+- Emphasize the logical relationships between problems and the overall conclusion
+Approximately 400 words
+
+## 8.2 Model Applications and Generalization
+Discuss practical application value and potential generalizations:
+- Specify which real-world domains the model can be applied to
+- What adjustments are needed for generalization
+- Recommendations for decision makers
+Approximately 200 words
+"""
+conclusion = """Reference template and requirements:
+# 9 Letter to the Decision Maker (Memo)
+Write a professional memo/letter summarizing the key findings and recommendations
+for the relevant decision maker or organization mentioned in the problem.
+
+Requirements:
+- Use professional, non-technical language accessible to decision makers
+- Start with a brief context statement (1-2 sentences)
+- Present 3-5 key findings with supporting data
+- Provide actionable recommendations (what should the decision maker do?)
+- Address potential risks or limitations briefly
+- End with a forward-looking statement
+
+Format: Formal memo format with To/From/Date/Subject header
+Approximately 400-500 words
+"""
+
+# ============= Coder Prompt Templates =============
+[coder_prompts]
+eda = """
+Based on the solution approach provided by the modeler: {solution}
+Perform EDA analysis (data cleaning, visualization) on the data in the current directory. Save cleaned data to the current directory. **No complex models needed.**
+"""
+
+ques_template = """
+Based on the solution approach provided by the modeler: {solution}
+Complete the following problem: {question}
+"""
+
+sensitivity_analysis = """
+Based on the solution approach provided by the modeler: {solution}
+Perform sensitivity analysis.
+"""
+
+# ============= Writer Prompt Templates =============
+[writer_prompts]
+firstPage = """Problem background: {background}. No code needed. Based on the model solution information: {model_build_solve}, write the Title, Summary, and Keywords according to this template: {template}"""
+
+RepeatQues = """Problem background: {background}. No code needed. Based on the model solution information: {model_build_solve}, write the Introduction section according to this template: {template}"""
+
+analysisQues = """Problem background: {background}. No code needed. Based on the model solution information: {model_build_solve}, write the Problem Analysis section according to this template: {template}"""
+
+modelAssumption = """Problem background: {background}. No code needed. Based on the model solution information: {model_build_solve}, write the Assumptions section according to this template: {template}"""
+
+symbol = """No code needed. Based on the model solution information: {model_build_solve}, write the Notations section according to this template: {template}"""
+
+innovation_benchmark = """No code needed. Based on the model solution information: {model_build_solve}, write the Strengths and Weaknesses section according to this template: {template}"""
+
+judge = """No code needed. Based on the model solution information: {model_build_solve}, write the Conclusions section according to this template: {template}"""
+
+conclusion = """Problem background: {background}. No code needed. Based on the model solution information: {model_build_solve}, write the Memo/Letter according to this template: {template}"""
+
+eda = """Problem background: {background}. No code needed. Coder results: {coder_response}, {code_output}. Write according to this template: {template}"""
+
+ques_template = """Problem background: {background}. No code needed. Coder results: {coder_response}, {code_output}. Write according to this template: {template}"""
+
+sensitivity_analysis = """Problem background: {background}. No code needed. Coder results: {coder_response}, {code_output}. Write according to this template: {template}"""
+
+model_comparison = """No code needed. Based on the model solution information: {model_build_solve}, write the Multi-Model Comparative Analysis section according to this template: {template}"""

@@ -1,0 +1,61 @@
+% new_command.tex - 自定义命令和宏包引入
+% 基于 QTH1225/LaTeX-in-ICM-MCM 模板
+
+% 算法与伪代码
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+% 交叉引用
+\usepackage{cleveref}
+
+% 代码排版 - Python 样式
+\lstdefinestyle{Python}{
+    language=Python,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{red},
+    showstringspaces=false,
+    basicstyle=\small\ttfamily,
+    numberstyle=\footnotesize,
+    numbers=left,
+    stepnumber=1,
+    numbersep=8pt,
+    tabsize=4,
+    showspaces=false,
+    showstringspaces=false,
+    frame=single,
+    breaklines=true,
+    breakatwhitespace=false,
+    escapeinside={(*@}{@*)},
+    backgroundcolor=\color{grey},
+}
+
+% 代码排版 - MATLAB 样式
+\lstdefinestyle{Matlab}{
+    language=Matlab,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color[rgb]{0.627,0.126,0.941},
+    backgroundcolor=\color{grey},
+    showstringspaces=false,
+    basicstyle=\small\ttfamily,
+    numberstyle=\footnotesize,
+    numbers=left,
+    stepnumber=1,
+    numbersep=8pt,
+    tabsize=4,
+    frame=single,
+    breaklines=true,
+    breakatwhitespace=false,
+    escapeinside={(*@}{@*)},
+}
+
+% TikZ 绘图
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+
+% 图文混排
+\usepackage{wrapfig}
+
+% 上标引用命令
+\newcommand{\upcite}[1]{\textsuperscript{\textsuperscript{\cite{#1}}}}

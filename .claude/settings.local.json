@@ -1,0 +1,58 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(python *)",
+      "Bash(uv *)",
+      "Bash(uv run *)",
+      "Bash(uv sync *)",
+      "Bash(pytest *)",
+      "Bash(pnpm *)",
+      "Bash(npx *)",
+      "Bash(docker *)",
+      "Bash(docker-compose *)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git branch*)",
+      "Bash(git checkout*)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git stash*)",
+      "Bash(git show*)",
+      "Bash(git merge*)",
+      "Bash(mkdir *)",
+      "Bash(ls *)",
+      "Bash(dir *)",
+      "Bash(type *)",
+      "Bash(ruff *)",
+      "Bash(biome *)",
+      "Bash(curl *)",
+      "Bash(pip *)",
+      "Bash(node *)",
+      "Bash(set ENV=*)",
+      "Bash(uvicorn *)"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(rm -rf /*)",
+      "Bash(sudo rm *)",
+      "Bash(del /s /q C:\\*)",
+      "Bash(format *)",
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)",
+      "Bash(DROP TABLE*)",
+      "Bash(DROP DATABASE*)"
+    ],
+    "ask": [
+      "Bash(git push*)",
+      "Bash(docker-compose down*)",
+      "Bash(rm *)",
+      "Bash(del *)"
+    ]
+  },
+  "teammateMode": "in-process",
+  "model": "claude-sonnet-4-20250514"
+}

@@ -1,0 +1,386 @@
+# =============================================================================
+# MathModelAgent - Release 发布流水线
+# =============================================================================
+# 触发条件: 创建 Git Tag (v*)
+# 功能: 完整测试 -> 构建生产镜像 -> 创建 GitHub Release -> 推送镜像
+#
+# 发布流程:
+#   1. 在本地创建 tag: git tag -a v1.0.0 -m "Release v1.0.0"
+#   2. 推送 tag: git push origin v1.0.0
+#   3. 此工作流自动触发，完成测试、构建、发布全流程
+#
+# 版本号规范 (Semantic Versioning):
+#   - v1.0.0: 主版本号.次版本号.修订号
+#   - v1.0.0-rc.1: 预发布版本 (Release Candidate)
+#   - v1.0.0-beta.1: Beta 版本
+# =============================================================================
+
+name: Release - 版本发布
+
+on:
+  push:
+    tags:
+      - "v*"
+
+env:
+  PYTHON_VERSION: "3.12"
+  NODE_VERSION: "20"
+  REGISTRY: ghcr.io
+  BACKEND_IMAGE: ghcr.io/${{ github.repository }}/backend
+  FRONTEND_IMAGE: ghcr.io/${{ github.repository }}/frontend
+  NGINX_IMAGE: ghcr.io/${{ github.repository }}/nginx
+  SANDBOX_IMAGE: ghcr.io/${{ github.repository }}/sandbox
+
+jobs:
+  # ============= 提取版本信息 =============
+  prepare:
+    name: 准备发布信息
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      is_prerelease: ${{ steps.version.outputs.is_prerelease }}
+    steps:
+      - name: 提取版本号
+        id: version
+        run: |
+          # 从 tag 中提取版本号 (去掉 v 前缀)
+          VERSION=${GITHUB_REF_NAME#v}
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+          # 判断是否为预发布版本 (包含 - 的为预发布，如 v1.0.0-rc.1)
+          if [[ "${VERSION}" == *"-"* ]]; then
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+            echo "检测到预发布版本: ${VERSION}"
+          else
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+            echo "检测到正式版本: ${VERSION}"
+          fi
+
+  # ============= 完整测试套件 =============
+  test-backend:
+    name: 后端完整测试
+    runs-on: ubuntu-latest
+    needs: prepare
+    services:
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: 安装 uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+          cache-dependency-glob: "backend/uv.lock"
+
+      - name: 安装依赖
+        working-directory: ./backend
+        run: uv sync --frozen --group dev
+
+      - name: Ruff 代码检查
+        working-directory: ./backend
+        run: |
+          uv run ruff check app/
+          uv run ruff format app/ --check
+
+      - name: 运行完整测试 (含覆盖率门禁)
+        working-directory: ./backend
+        env:
+          ENV: test
+          REDIS_URL: redis://localhost:6379/0
+        run: |
+          uv run pytest app/tests/ \
+            --cov=app \
+            --cov-report=xml \
+            --cov-report=html \
+            --cov-report=term-missing \
+            --cov-fail-under=60 \
+            -v \
+            --tb=short
+
+      - name: 上传覆盖率报告
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: |
+            backend/coverage.xml
+            backend/htmlcov/
+          retention-days: 30
+
+  test-frontend:
+    name: 前端完整测试
+    runs-on: ubuntu-latest
+    needs: prepare
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: 安装依赖
+        working-directory: ./frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Biome 代码检查
+        working-directory: ./frontend
+        run: pnpm exec biome check src/
+
+      - name: 构建生产版本
+        working-directory: ./frontend
+        run: pnpm run build
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist-release
+          path: frontend/dist/
+          retention-days: 30
+
+  # ============= 安全扫描 =============
+  security-scan:
+    name: 发布前安全扫描
+    runs-on: ubuntu-latest
+    needs: prepare
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: Trivy 漏洞扫描
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "fs"
+          scan-ref: "."
+          severity: "CRITICAL,HIGH"
+          exit-code: "1"
+          format: "table"
+
+  # ============= 构建生产 Docker 镜像 =============
+  build-production-images:
+    name: 构建生产镜像
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend, security-scan]
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 登录 GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 提取构建元数据
+        id: meta
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "short_sha=${SHORT_SHA}" >> $GITHUB_OUTPUT
+          echo "build_date=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+
+      # --- 后端镜像 ---
+      - name: 构建并推送后端镜像
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.BACKEND_IMAGE }}:${{ steps.meta.outputs.version }}
+            ${{ env.BACKEND_IMAGE }}:${{ steps.meta.outputs.short_sha }}
+            ${{ env.BACKEND_IMAGE }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          labels: |
+            org.opencontainers.image.version=${{ steps.meta.outputs.version }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created=${{ steps.meta.outputs.build_date }}
+            org.opencontainers.image.title=MathModelAgent Backend
+            org.opencontainers.image.description=MathModelAgent 后端服务
+
+      # --- 前端镜像 ---
+      - name: 构建并推送前端镜像
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile.prod
+          push: true
+          tags: |
+            ${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs.version }}
+            ${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs.short_sha }}
+            ${{ env.FRONTEND_IMAGE }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          labels: |
+            org.opencontainers.image.version=${{ steps.meta.outputs.version }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created=${{ steps.meta.outputs.build_date }}
+            org.opencontainers.image.title=MathModelAgent Frontend
+
+      # --- Nginx 镜像 ---
+      - name: 构建并推送 Nginx 镜像
+        uses: docker/build-push-action@v6
+        with:
+          context: ./nginx
+          file: ./nginx/Dockerfile
+          push: true
+          tags: |
+            ${{ env.NGINX_IMAGE }}:${{ steps.meta.outputs.version }}
+            ${{ env.NGINX_IMAGE }}:${{ steps.meta.outputs.short_sha }}
+            ${{ env.NGINX_IMAGE }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # --- 沙箱镜像 ---
+      - name: 构建并推送沙箱镜像
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile.sandbox
+          push: true
+          tags: |
+            ${{ env.SANDBOX_IMAGE }}:${{ steps.meta.outputs.version }}
+            ${{ env.SANDBOX_IMAGE }}:${{ steps.meta.outputs.short_sha }}
+            ${{ env.SANDBOX_IMAGE }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ============= 创建 GitHub Release =============
+  create-release:
+    name: 创建 GitHub Release
+    runs-on: ubuntu-latest
+    needs: build-production-images
+    permissions:
+      contents: write
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 获取完整历史，用于生成 changelog
+
+      - name: 提取版本信息
+        id: meta
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+          # 获取上一个 tag (用于生成变更日志)
+          PREV_TAG=$(git tag --sort=-version:refname | grep -v "^${GITHUB_REF_NAME}$" | head -1)
+          if [ -n "${PREV_TAG}" ]; then
+            echo "prev_tag=${PREV_TAG}" >> $GITHUB_OUTPUT
+            echo "上一个版本: ${PREV_TAG}"
+          else
+            echo "prev_tag=" >> $GITHUB_OUTPUT
+            echo "未找到上一个版本，这是首次发布"
+          fi
+
+      - name: 生成变更日志
+        id: changelog
+        run: |
+          # 生成自上个 tag 以来的 commit 记录
+          if [ -n "${{ steps.meta.outputs.prev_tag }}" ]; then
+            CHANGES=$(git log ${{ steps.meta.outputs.prev_tag }}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          else
+            CHANGES=$(git log --pretty=format:"- %s (%h)" --no-merges -20)
+          fi
+
+          # 写入文件 (避免多行字符串在 GITHUB_OUTPUT 中的问题)
+          echo "${CHANGES}" > /tmp/changelog.txt
+
+      - name: 下载覆盖率报告
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report
+          path: ./coverage-report
+
+      - name: 创建 Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "MathModelAgent ${{ github.ref_name }}"
+          body: |
+            ## MathModelAgent ${{ github.ref_name }}
+
+            ### Docker 镜像
+
+            本版本的 Docker 镜像已推送到 GitHub Container Registry:
+
+            ```bash
+            # 拉取指定版本
+            docker pull ${{ env.BACKEND_IMAGE }}:${{ steps.meta.outputs.version }}
+            docker pull ${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs.version }}
+            docker pull ${{ env.NGINX_IMAGE }}:${{ steps.meta.outputs.version }}
+            docker pull ${{ env.SANDBOX_IMAGE }}:${{ steps.meta.outputs.version }}
+            ```
+
+            ### 快速部署
+
+            ```bash
+            # 克隆仓库并切换到此版本
+            git clone https://github.com/${{ github.repository }}.git
+            cd MathModelAgent
+            git checkout ${{ github.ref_name }}
+
+            # 使用 Docker Compose 启动
+            docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+            ```
+
+            ### 变更记录
+
+            <details>
+            <summary>查看详细变更</summary>
+
+            $(cat /tmp/changelog.txt)
+
+            </details>
+
+            ### 系统要求
+
+            - Docker >= 24.0
+            - Docker Compose >= 2.20
+            - 最低 2GB 内存
+          prerelease: ${{ needs.prepare.outputs.is_prerelease == 'true' }}
+          generate_release_notes: true
+          files: |
+            coverage-report/coverage.xml
+
+      - name: 输出发布摘要
+        run: |
+          echo "## Release ${{ github.ref_name }} 发布成功" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- 版本: \`${{ steps.meta.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- 预发布: \`${{ needs.prepare.outputs.is_prerelease }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- 镜像: 已推送到 \`ghcr.io\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Release: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY

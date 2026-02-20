@@ -7,16 +7,16 @@ from uuid import uuid4
 class Message(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid4()))
     msg_type: Literal[
-        "system", "agent", "user", "tool"
-    ]  # system msg | agent message | user message | tool message
+        "system", "agent", "user", "tool", "progress", "stream"
+    ]  # system msg | agent message | user message | tool message | progress message | stream message
     content: str | None = None
 
 
 class ToolMessage(Message):
     msg_type: str = "tool"
     tool_name: Literal["execute_code", "search_scholar"]
-    input: dict
-    output: list
+    input: dict | None = None
+    output: list | None = None
 
 
 class SystemMessage(Message):
@@ -81,6 +81,15 @@ class ErrorModel(CodeExecution):
 OutputItem = Union[StdOutModel, StdErrModel, ResultModel, ErrorModel]
 
 
+class ProgressMessage(Message):
+    """任务进度消息"""
+    msg_type: str = "progress"
+    type: Literal["info", "warning", "success", "error"] = "info"
+    percent: float = 0.0
+    phase: str = ""
+    message: str = ""
+
+
 class ScholarMessage(ToolMessage):
     tool_name: str = "search_scholar"
     input: dict | None = None  # query
@@ -104,12 +113,23 @@ class WriterMessage(AgentMessage):
     sub_title: str | None = None
 
 
+class StreamMessage(Message):
+    """LLM 流式输出消息，前端按 message_id 拼接 delta"""
+    msg_type: str = "stream"
+    agent_type: str = ""       # 哪个 agent 在说话
+    delta: str = ""            # 增量 token 内容
+    message_id: str = ""       # 用于前端识别同一消息流
+    done: bool = False         # 是否流式结束
+
+
 # 所有可能的消息类型
 MessageType = Union[
     SystemMessage,
+    ProgressMessage,
     UserMessage,
     ModelerMessage,
     CoderMessage,
     WriterMessage,
     CoordinatorMessage,
+    StreamMessage,
 ]

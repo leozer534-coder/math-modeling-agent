@@ -5,6 +5,7 @@ export interface ValidateApiKeyRequest {
   api_key: string;
   base_url?: string;
   model_id: string;
+  api_format?: string;
 }
 
 // 验证 API Key 响应

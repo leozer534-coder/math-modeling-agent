@@ -57,7 +57,7 @@ class RichPrinter:
 
     @staticmethod
     def print_agent_msg(message: str, agent_name: str):
-        logger.info(f"{agent_name}: {message}")
+        logger.info("%s: %s", agent_name, message)
         if agent_name == "CoderAgent":
             rprint(
                 f"[bold purple on green]{agent_name}[/bold purple on green]: {message}"
@@ -141,7 +141,7 @@ class RichPrinter:
         formatted.append(f"Agent: {agent_name} ", style="bold cyan")
         formatted.append("开始执行", style="bold blue")
         cls._console.print(Panel.fit(formatted, border_style="blue", padding=(1, 4)))
-        logger.info(f"\n================Agent: {agent_name}开始=================\n")
+        logger.info("\n================Agent: %s开始=================\n", agent_name)
 
     @classmethod
     def agent_end(cls, agent_name: str):
@@ -152,4 +152,4 @@ class RichPrinter:
         formatted.append(f"Agent: {agent_name} ", style="bold cyan")
         formatted.append("执行完成", style="bold green")
         cls._console.print(Panel.fit(formatted, border_style="green", padding=(1, 4)))
-        logger.info(f"\n================Agent: {agent_name}结束==================\n")
+        logger.info("\n================Agent: %s结束==================\n", agent_name)

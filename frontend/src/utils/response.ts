@@ -7,14 +7,14 @@ import { AgentType } from './enum';
 
 export interface BaseMessage {
   id: string;
-  msg_type: 'system' | 'agent' | 'user' | 'tool';
+  msg_type: 'system' | 'agent' | 'user' | 'tool' | 'progress' | 'stream';
   content?: string | null;
 }
 
 export interface ToolMessage extends BaseMessage {
   msg_type: 'tool';
   tool_name: 'execute_code' | 'search_scholar';
-  input: any;
+  input: Record<string, unknown> | null;
   output: string[] | OutputItem[] | null;
 }
 
@@ -42,7 +42,7 @@ export interface CoordinatorMessage extends AgentMessage {
 
 
 // 代码执行结果类型
-export type ExecutionFormat = 
+export type ExecutionFormat =
   | 'text'
   | 'html'
   | 'markdown'
@@ -83,7 +83,7 @@ export type OutputItem = StdOutExecution | StdErrExecution | ResultExecution | E
 
 export interface ScholarMessage extends ToolMessage {
   tool_name: 'search_scholar';
-  input: {};
+  input: Record<string, unknown>;
   output: string[];
 }
 
@@ -105,4 +105,52 @@ export interface WriterMessage extends AgentMessage {
   sub_title?: string;
 }
 
-export type Message = SystemMessage | UserMessage | CoderMessage | WriterMessage | ModelerMessage | CoordinatorMessage | ToolMessage;
+export interface ReviewerMessage extends AgentMessage {
+  agent_type: AgentType.REVIEWER;
+  review_score?: number;
+  dimension_scores?: Record<string, number>;
+}
+
+export interface AnalyzerMessage extends AgentMessage {
+  agent_type: AgentType.ANALYZER;
+}
+
+export interface ValidatorMessage extends AgentMessage {
+  agent_type: AgentType.VALIDATOR;
+}
+
+export interface OptimizerMessage extends AgentMessage {
+  agent_type: AgentType.OPTIMIZER;
+}
+
+export interface ProgressMessage extends BaseMessage {
+  msg_type: 'progress';
+  type: SystemMessageType;
+  percent: number;
+  phase: string;
+  message: string;
+  elapsed_time?: number;
+  sub_phase?: string;
+  iteration?: number;
+  max_iterations?: number;
+  quality_score?: number;
+}
+
+export interface TaskStatusMessage {
+  id: string;
+  msg_type: 'task_status';
+  content?: string | null;
+  status: string;
+  phase?: string;
+  error?: string;
+}
+
+export interface StreamMessage extends BaseMessage {
+  msg_type: 'stream';
+  agent_type: string;
+  delta: string;
+  message_id: string;
+  done: boolean;
+}
+
+export type Message = SystemMessage | ProgressMessage | UserMessage | CoderMessage | WriterMessage | ModelerMessage | CoordinatorMessage | ReviewerMessage | AnalyzerMessage | ValidatorMessage | OptimizerMessage | ToolMessage | StreamMessage;

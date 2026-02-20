@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useTaskStore } from '@/stores/task'
 import { Separator } from '@/components/ui/separator'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { renderMarkdown } from '@/utils/markdown'
 
 const taskStore = useTaskStore()
 
@@ -64,6 +65,53 @@ const questionsList = computed(() => {
   }
   return questions
 })
+
+// ---- Markdown 渲染 ----
+const renderedTitle = ref('')
+const renderedBackground = ref('')
+const renderedQuestions = ref<Record<number, string>>({})
+const renderedEda = ref('')
+const renderedSolutions = ref<Record<number, string>>({})
+const renderedSensitivity = ref('')
+
+// 渲染 coordinator 数据
+watch(coordinatorData, async (data) => {
+  if (!data) {
+    renderedTitle.value = ''
+    renderedBackground.value = ''
+    renderedQuestions.value = {}
+    return
+  }
+  if (data.title) renderedTitle.value = await renderMarkdown(data.title)
+  if (data.background) renderedBackground.value = await renderMarkdown(data.background)
+
+  const qMap: Record<number, string> = {}
+  for (const q of questionsList.value) {
+    qMap[q.number] = await renderMarkdown(q.content)
+  }
+  renderedQuestions.value = qMap
+}, { immediate: true })
+
+// 渲染 modeler 数据
+watch([modelerData, questionsList], async ([mData, qList]) => {
+  if (!mData) {
+    renderedEda.value = ''
+    renderedSolutions.value = {}
+    renderedSensitivity.value = ''
+    return
+  }
+  if (mData.eda) renderedEda.value = await renderMarkdown(mData.eda)
+  if (mData.sensitivity_analysis) renderedSensitivity.value = await renderMarkdown(mData.sensitivity_analysis)
+
+  const sMap: Record<number, string> = {}
+  for (const q of qList) {
+    const key = `ques${q.number}`
+    if (mData[key]) {
+      sMap[q.number] = await renderMarkdown(mData[key])
+    }
+  }
+  renderedSolutions.value = sMap
+}, { immediate: true })
 </script>
 
 <template>
@@ -80,8 +128,7 @@ const questionsList = computed(() => {
               <!-- 题目标题 -->
               <div class="space-y-2">
                 <h3 class="text-base font-medium text-gray-700">题目标题</h3>
-                <div class="text-lg font-semibold text-gray-900">
-                  {{ coordinatorData.title }}
+                <div class="text-lg font-semibold text-gray-900 prose prose-slate max-w-none" v-html="renderedTitle">
                 </div>
               </div>
 
@@ -90,8 +137,8 @@ const questionsList = computed(() => {
               <!-- 题目背景 -->
               <div class="space-y-2">
                 <h3 class="text-base font-medium text-gray-700">题目背景</h3>
-                <div class="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
-                  {{ coordinatorData.background }}
+                <div class="prose prose-slate max-w-none text-sm text-gray-800 leading-relaxed"
+                  v-html="renderedBackground">
                 </div>
               </div>
 
@@ -110,8 +157,8 @@ const questionsList = computed(() => {
                     <div class="text-sm font-medium text-blue-700 mb-1">
                       问题 {{ question.number }}
                     </div>
-                    <div class="text-sm text-gray-800 leading-relaxed">
-                      {{ question.content }}
+                    <div class="prose prose-slate max-w-none text-sm text-gray-800 leading-relaxed"
+                      v-html="renderedQuestions[question.number] || ''">
                     </div>
                   </div>
                 </div>
@@ -141,8 +188,9 @@ const questionsList = computed(() => {
                   <span class="px-2 py-1 text-xs bg-gray-200 border rounded">EDA</span>
                   探索性数据分析
                 </h3>
-                <div class="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap bg-gray-50 p-3 rounded">
-                  {{ modelerData.eda }}
+                <div
+                  class="prose prose-slate max-w-none text-sm text-gray-800 leading-relaxed bg-gray-50 p-3 rounded"
+                  v-html="renderedEda">
                 </div>
               </div>
 
@@ -154,8 +202,8 @@ const questionsList = computed(() => {
                     解决方案
                   </h3>
                   <div
-                    class="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap bg-green-50 p-3 rounded border-l-4 border-green-500">
-                    {{ modelerData[`ques${question.number}`] }}
+                    class="prose prose-slate max-w-none text-sm text-gray-800 leading-relaxed bg-green-50 p-3 rounded border-l-4 border-green-500"
+                    v-html="renderedSolutions[question.number] || ''">
                   </div>
                 </div>
               </div>
@@ -166,8 +214,8 @@ const questionsList = computed(() => {
                   <span class="px-2 py-1 text-xs bg-gray-200 border rounded">敏感性分析</span>
                 </h3>
                 <div
-                  class="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap bg-orange-50 p-3 rounded border-l-4 border-orange-500">
-                  {{ modelerData.sensitivity_analysis }}
+                  class="prose prose-slate max-w-none text-sm text-gray-800 leading-relaxed bg-orange-50 p-3 rounded border-l-4 border-orange-500"
+                  v-html="renderedSensitivity">
                 </div>
               </div>
             </div>
@@ -182,4 +230,27 @@ const questionsList = computed(() => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+@import 'katex/dist/katex.min.css';
+
+:deep(.prose h1) { @apply text-2xl font-bold mb-4 text-gray-900; }
+:deep(.prose h2) { @apply text-xl font-semibold mt-3 mb-3 text-gray-800; }
+:deep(.prose h3) { @apply text-lg font-semibold mt-2 mb-2 text-gray-800; }
+:deep(.prose p) { @apply mb-3 leading-relaxed; }
+:deep(.prose ul) { @apply list-disc ml-6 mb-3 space-y-1; }
+:deep(.prose ol) { @apply list-decimal ml-6 mb-3 space-y-1; }
+:deep(.prose blockquote) { @apply border-l-4 border-gray-300 pl-4 italic my-3 text-gray-600; }
+:deep(.prose a) { @apply text-blue-600 hover:text-blue-800 underline; }
+:deep(.prose hr) { @apply my-6 border-gray-200; }
+:deep(.prose table) { @apply w-full border-collapse my-4 !border-2 !border-gray-400; }
+:deep(.prose th) { @apply !bg-gray-200 p-2 text-left !font-bold !text-gray-900 !border !border-gray-400; }
+:deep(.prose td) { @apply p-2 !text-gray-900 !border !border-gray-400; }
+:deep(.prose tr:nth-child(even)) { @apply !bg-gray-50; }
+:deep(.prose code) { @apply bg-gray-100 px-1 py-0.5 rounded text-sm font-mono; }
+:deep(.prose pre) { @apply bg-gray-100 p-3 rounded-lg overflow-x-auto my-3; }
+:deep(.prose pre code) { @apply bg-transparent p-0; }
+:deep(.prose .math-block) { @apply my-3 overflow-x-auto; text-align: center; }
+:deep(.prose .katex-display) { @apply my-3 overflow-x-auto; }
+:deep(.prose .katex) { font-size: 1.1em; }
+:deep(.prose strong) { @apply font-bold text-gray-900; }
+</style>

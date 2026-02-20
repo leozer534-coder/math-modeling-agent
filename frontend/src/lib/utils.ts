@@ -1,4 +1,5 @@
-import type { Updater } from '@tanstack/vue-table'
+// import type { Updater } from '@tanstack/vue-table'
+export type Updater<T> = T | ((prev: T) => T)
 import type { Ref } from 'vue'
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'

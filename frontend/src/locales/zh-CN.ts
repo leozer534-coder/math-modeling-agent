@@ -1,0 +1,361 @@
+// 中文语言包
+export default {
+	// 通用
+	common: {
+		appName: "MathModelAgent",
+		loading: "加载中...",
+		processing: "处理中...",
+		confirm: "确认",
+		cancel: "取消",
+		save: "保存",
+		delete: "删除",
+		edit: "编辑",
+		close: "关闭",
+		back: "返回",
+		more: "更多",
+		website: "官网",
+		error: "出错了",
+		retry: "重试",
+		success: "操作成功",
+		noData: "暂无数据",
+		copy: "复制",
+		copied: "已复制",
+		reset: "重置",
+	},
+
+	// 导航
+	nav: {
+		features: "功能",
+		workflow: "工作流",
+		agents: "智能体",
+		login: "登录",
+		getStartedFree: "免费开始",
+		product: "产品",
+		community: "社区",
+		language: "语言",
+		switchLang: "切换语言",
+	},
+
+	// 首页
+	home: {
+		// Hero 区域
+		heroTag: "AI 驱动的数学建模智能体",
+		heroTitle1: "数学建模竞赛",
+		heroTitle2: "从 3 天到 1 小时",
+		heroDesc:
+			"多智能体协作系统，自动完成问题分析、数学建模、代码实现、论文撰写全流程，输出获奖级别的完整论文。",
+		ctaStart: "立即体验",
+		ctaGithub: "查看源码",
+
+		// 数据亮点
+		statEfficiency: "效率提升",
+		statAgents: "协作智能体",
+		statAutomation: "自动化",
+		statEfficiencyValue: "72x",
+		statAgentsValue: "5+",
+		statAutomationValue: "全流程",
+
+		// 工作流
+		workflowTitle: "四步完成数学建模",
+		workflowDesc: "从上传题目到输出论文，全程自动化",
+		workflowStep1Title: "上传题目",
+		workflowStep1Desc:
+			"上传竞赛题目和数据集，支持 .txt, .csv, .xlsx 等常见格式。",
+		workflowStep2Title: "智能分析",
+		workflowStep2Desc: "建模智能体自动分析问题，选择最优的数学模型与求解策略。",
+		workflowStep3Title: "代码实现",
+		workflowStep3Desc:
+			"编码智能体编写 Python 代码，在沙箱中执行并自动调试优化。",
+		workflowStep4Title: "论文输出",
+		workflowStep4Desc:
+			"写作智能体生成完整的数学建模论文，含图表、公式与参考文献。",
+
+		// 智能体
+		agentsTitle: "多智能体协作",
+		agentsDesc: "专业分工，各司其职，协同产出高质量成果",
+		agentCoordinator: "协调者",
+		agentCoordinatorRole: "Coordinator Agent",
+		agentCoordinatorDesc: "分析任务需求，制定求解方案，调度各智能体协作执行。",
+		agentModeler: "建模者",
+		agentModelerRole: "Modeler Agent",
+		agentModelerDesc: "选择数学模型，构建方程体系，确定求解算法与参数。",
+		agentCoder: "编码者",
+		agentCoderRole: "Coder Agent",
+		agentCoderDesc: "编写 Python 代码，执行计算，生成可视化图表，自动调试。",
+		agentWriter: "写作者",
+		agentWriterRole: "Writer Agent",
+		agentWriterDesc: "撰写完整论文，规范排版，含摘要、正文、图表与参考文献。",
+
+		// 核心能力
+		featuresTitle: "核心能力",
+		featuresDesc: "为数学建模竞赛量身打造的全方位能力",
+		feature1Title: "智能问题分析",
+		feature1Desc: "自动解析竞赛题目，识别关键变量、约束条件和求解目标。",
+		feature2Title: "数据可视化",
+		feature2Desc: "自动生成统计图表、热力图、散点图等，直观展示分析结果。",
+		feature3Title: "代码沙箱执行",
+		feature3Desc: "支持本地 Jupyter 和云端 E2B，安全隔离的代码执行环境。",
+		feature4Title: "多模型支持",
+		feature4Desc:
+			"通过 LiteLLM 统一接口，支持 DeepSeek、Claude、GPT 等主流模型。",
+		feature5Title: "论文自动生成",
+		feature5Desc: "输出含完整结构的 Markdown 论文，支持数学公式与图表引用。",
+		feature6Title: "智能容错",
+		feature6Desc: "A2A 自动升级机制，代码出错时智能重试并切换更强模型。",
+
+		// CTA 区域
+		ctaSectionTitle: "准备好开始了吗？",
+		ctaSectionDesc:
+			"上传题目，让 AI 帮你完成建模、编码、论文全流程，体验前所未有的效率提升。",
+		ctaSectionButton: "免费开始使用",
+		ctaSectionNote: "无需信用卡，即刻开始",
+
+		// Footer
+		footerDesc:
+			"AI 驱动的数学建模智能体，通过多 Agent 协作自动完成从分析到论文的全流程。",
+		footerCopyright: "© {year} MathModelAgent. All rights reserved.",
+		footerSlogan: "Built with AI, for Mathematicians.",
+	},
+
+	// 登录页
+	login: {
+		welcomeBack: "欢迎使用",
+		loginDesc: "使用 Google 账号登录 MathModelAgent",
+		googleButton: "使用 Google 账号登录",
+		googleHint: "我们将使用您的 Google 账号进行安全认证",
+		termsText: "点击继续即表示您同意我们的",
+		termsOfService: "服务条款",
+		and: "和",
+		privacyPolicy: "隐私政策",
+		// Google OAuth 错误提示
+		errorTokenExchange: "认证失败，请重试",
+		errorUserInfo: "获取用户信息失败，请重试",
+		errorAccountDisabled: "该账号已被禁用",
+		errorServer: "服务器错误，请稍后重试",
+		errorMissingCode: "认证信息缺失，请重试",
+		errorUnknown: "登录失败，请重试",
+		// 登录页右侧面板
+		slogan: "AI 驱动的数学建模智能助手",
+		featureMultiAgent: "多 Agent 协作",
+		featureMultiAgentDesc: "智能体协同解题",
+		featureCodeSandbox: "代码执行沙箱",
+		featureCodeSandboxDesc: "安全隔离运行环境",
+		featurePaperGen: "论文自动生成",
+		featurePaperGenDesc: "一键输出完整论文",
+	},
+
+	// 聊天页
+	chat: {
+		more: "更多",
+		website: "官网",
+		newTask: "开始新任务",
+		historyTasks: "历史任务",
+		noHistory: "暂无历史任务",
+		start: "开始",
+	},
+
+	// 聊天主页
+	chatHome: {
+		welcomeTitle: "有什么可以帮你的？",
+		welcomeDesc: "上传题目和数据，AI 智能体将自动完成建模、编码与论文撰写",
+		agentCoordinator: "任务调度",
+		agentModeler: "数学建模",
+		agentCoder: "代码执行",
+		agentWriter: "论文撰写",
+		examplesTitle: "快速开始：选择一个样例题目",
+		dropFiles: "松开鼠标上传文件",
+		dropFilesHint: "支持 .txt, .csv, .xlsx 等格式",
+		textareaPlaceholder: "粘贴完整的数学建模题目... (Ctrl+Enter 提交)",
+		uploadTooltip: "上传数据文件",
+		settingsTooltip: "任务参数设置",
+		submitting: "提交中...",
+		startAnalysis: "开始分析",
+		bottomHint: "提交后系统将自动调度 AI 智能体协同工作，全程无需干预",
+		fileAdded: "文件已添加",
+		fileAddedDesc: "已添加 {count} 个文件",
+		confirmContinue: "确认继续",
+		noFileWarning:
+			"您尚未上传数据文件。部分题目需要数据集才能完成分析，确定要继续吗？",
+		goUpload: "去上传文件",
+		continueSubmit: "继续提交",
+		configureApiKey: "请先配置 API Key",
+		configureApiKeyDesc: "在侧边栏底部 → 头像 → API Key 中配置",
+		taskSubmitted: "任务提交成功",
+		taskId: "任务编号：{id}",
+		taskSubmitFailed: "任务提交失败",
+		taskSubmitFailedDesc: "请检查网络连接和 API Key 配置",
+		loadExampleFailed: "加载样例失败",
+		loadExampleFailedDesc: "请稍后重试",
+		// 参数配置选项
+		templateLabel: "模板",
+		templatePlaceholder: "选择模板",
+		templateNational: "国赛",
+		templateMCM: "美赛",
+		languageLabel: "语言",
+		languagePlaceholder: "选择语言",
+		languageChinese: "中文",
+		languageEnglish: "英文",
+		formatLabel: "格式",
+		formatPlaceholder: "选择格式",
+		formatLatexHint: "美赛推荐，使用 mcmthesis 模板",
+		workflowLabel: "流程模式",
+		workflowPlaceholder: "选择流程",
+		workflowSmart: "智能模式",
+		workflowSmartHint: "根据题目复杂度自动选择",
+		workflowStandard: "标准模式",
+		workflowStandardHint: "快速流水线，适合简单题目",
+		workflowEnhanced: "增强模式",
+		workflowEnhancedHint: "含反馈环路和质量审核（Token +50%）",
+		workflowAward: "获奖级模式",
+		workflowAwardHint: "全功能协作，含研究+摘要+LaTeX（Token +80%）",
+		// 样例数据
+		example1Title: "母亲身心健康对婴儿成长的影响",
+		example1Source: "2023华数杯C题",
+		example1Tag1: "分类问题",
+		example1Tag2: "健康",
+		example2Title: "社交媒体平台用户分析问题",
+		example2Source: "2025五一杯C题",
+		example2Tag1: "社交媒体",
+		example2Tag2: "用户行为",
+		example3Title: "农作物的种植策略",
+		example3Source: "2024高教杯C题",
+		example3Tag1: "种植策略",
+		example3Tag2: "优化",
+	},
+
+	// API 设置对话框
+	apiDialog: {
+		title: "设置",
+		description: "管理 API 供应商配置，为每个 Agent 分配模型",
+		scholarSearch: "学术文献搜索",
+		optional: "可选",
+		scholarDesc:
+			"配置邮箱后，论文手撰写论文时将自动搜索相关学术文献作为参考引用，并获得更高的 API 速率",
+		openalexLabel: "OpenAlex Email",
+		validating: "验证中...",
+		validate: "验证",
+		openalexHint:
+			"提供邮箱可进入 OpenAlex Polite Pool，享受更快的请求速率。不填写则跳过文献搜索。",
+		saving: "保存中...",
+		saveConfig: "保存配置",
+		emailFormatError: "邮箱格式错误",
+		emailFormatErrorDesc: "请输入有效的邮箱地址",
+		verifySuccess: "验证成功",
+		verifyFailed: "验证失败",
+		verifyServiceFailed: "无法连接到 OpenAlex 服务",
+		connectionSuccess: "连接成功",
+		connectionFailed: "连接失败",
+		testFailed: "测试失败",
+		testServiceFailed: "无法连接到验证服务",
+		saveSuccess: "保存成功",
+		saveSuccessDesc: "配置已保存",
+		saveFailed: "保存失败",
+		saveFailedDesc: "无法保存配置",
+	},
+
+	// 设置面板
+	settings: {
+		deleteProviderWarning: "该供应商正被以下 Agent 使用，删除后将取消关联：",
+	},
+
+	// 供应商配置
+	provider: {
+		config: "供应商配置",
+		addProvider: "添加供应商",
+		noProviders: "暂无供应商配置",
+		addFirst: "添加第一个供应商",
+		headerName: "供应商",
+		headerApiKey: "API Key",
+		headerBaseUrl: "Base URL",
+		headerStatus: "状态",
+		headerActions: "操作",
+		statusValid: "可用",
+		statusInvalid: "不可用",
+		statusUntested: "未测试",
+		editTooltip: "编辑",
+		testTooltip: "测试连接",
+		deleteTooltip: "删除",
+	},
+
+	// Agent 分配
+	agent: {
+		assignTitle: "Agent 模型分配",
+		assignDesc: "为每个 Agent 分配使用的 AI 供应商",
+		coordinator: "协调者",
+		coordinatorDesc: "负责任务分解与协调",
+		modeler: "建模手",
+		modelerDesc: "负责数学建模",
+		coder: "代码手",
+		coderDesc: "负责代码实现",
+		writer: "论文手",
+		writerDesc: "负责论文撰写",
+		addProviderFirst: "请先添加供应商",
+		selectProvider: "选择供应商...",
+	},
+
+	// 供应商编辑对话框
+	providerEdit: {
+		addTitle: "添加供应商",
+		editTitle: "编辑供应商",
+		dialogDesc: "配置 API 供应商的连接信息",
+		presetTemplate: "预设模板",
+		templatePlaceholder: "选择预设模板快速填充...",
+		commonProviders: "常用供应商",
+		providerName: "供应商名称",
+		providerNamePlaceholder: "如：我的 DeepSeek",
+		apiKeyLabel: "API Key",
+		apiKeyPlaceholder: "请输入 API Key",
+		baseUrlLabel: "Base URL",
+		modelIdLabel: "Model ID",
+		modelIdPlaceholder: "模型名称，如 gpt-4o",
+		apiProtocol: "API 协议",
+		endpoint: "端点",
+		testing: "测试中...",
+		testConnection: "测试连接",
+		connectionFailed: "连接失败: 无法连接到验证服务",
+		custom: "自定义",
+		openaiProtocol: "OpenAI 协议",
+		anthropicProtocol: "Anthropic 协议",
+		geminiProtocol: "Gemini 协议",
+	},
+
+	// 关于对话框
+	about: {
+		title: "关于 MathModelAgent",
+		version: "AI 数学建模智能体 v0.1.0",
+		coreFeatures: "核心特性",
+		multiAgent: "多 Agent 协作 (Coordinator / Modeler / Coder / Writer)",
+		codeExec: "代码执行与调试 (Jupyter / E2B)",
+		paperGen: "论文自动生成 (Markdown)",
+		outputDir: "输出目录",
+		notebookDesc: "代码执行过程",
+		paperDesc: "生成的论文 (Markdown)",
+		customConfig: "自定义配置",
+		template: "模板",
+		prompts: "提示词",
+		helpSupport: "帮助与支持",
+		docs: "文档",
+		qqGroup: "QQ 群",
+	},
+
+	// 用户菜单
+	user: {
+		guest: "游客",
+		clickToLogin: "点击登录",
+		credits: "积分余额",
+		apiKey: "API Key",
+		accountSettings: "账户设置",
+		logout: "退出登录",
+		loginOrRegister: "登录",
+	},
+
+	// 错误消息
+	errors: {
+		networkError: "网络连接失败，请检查网络设置",
+		serverError: "服务器出错，请稍后重试",
+		unauthorized: "未授权，请重新登录",
+		notFound: "页面不存在",
+		timeout: "请求超时，请重试",
+		unknown: "发生未知错误",
+	},
+};

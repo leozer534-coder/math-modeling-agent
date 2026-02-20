@@ -1,9 +1,71 @@
+# === IDE / OS ===
 .vscode/
-backend/app/.DS_Store
-*.DS_Store
+.idea/
 .DS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
-.idea/
+Thumbs.db
+desktop.ini
+
+# === AI 工具临时目录 ===
+.agent/
+.dev/
+.spec-workflow/
+.playwright-mcp/
+.serena/
+.ruff_cache/
+.cursor/
+
+# === Python ===
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+dist/
+build/
+.coverage
+*.db
+.mypy_cache/
+.pytest_cache/
+
+# === Node.js ===
+node_modules/
+frontend/dist/
+
+# === 环境变量 ===
+.env
+.env.*
+!.env.example
+!.env.local.example
+!.env.prod.example
+
+# === 运行时 / 临时文件 ===
+logs/
+*.log
+nul
+redis-temp/
+
+# === 根目录截图（防止再次出现）===
+*.png
+*.jpeg
+*.jpg
+!frontend/src/**/*.png
+!frontend/src/**/*.jpg
+!frontend/public/**/*.png
+!frontend/public/**/*.jpg
+!docs/images/**/*.png
+!docs/images/**/*.jpg
+!docs/**/*.jpg
+!docs/**/*.png
+
+# === 运维配置（按需恢复）===
+monitoring/
+nginx/
+docker-compose.prod.yml
+frontend/Dockerfile.prod
+
+# === 其他 ===
+数学建模智能体/
+scripts/

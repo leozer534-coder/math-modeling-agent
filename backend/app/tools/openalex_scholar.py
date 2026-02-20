@@ -1,22 +1,37 @@
-import requests
+import asyncio
+
+import httpx
 from typing import List, Dict, Any
 from app.services.redis_manager import redis_manager
 from app.schemas.response import ScholarMessage
+from app.utils.log_util import logger
 
 
 class OpenAlexScholar:
-    def __init__(self, task_id: str, email: str = None):
-        """Initialize OpenAlex client.
+    def __init__(self, task_id: str, email: str | None = None):
+        """初始化 OpenAlex 客户端。
 
         Args:
-            email: Optional email for better API service
+            task_id: 任务 ID
+            email: 可选邮箱，用于获取更好的 API 服务
         """
         self.base_url = "https://api.openalex.org"
         self.email = email
         self.task_id = task_id
+        self._client = httpx.AsyncClient(timeout=30.0)
+
+    async def close(self) -> None:
+        """关闭底层 HTTP 客户端，释放连接池资源。"""
+        await self._client.aclose()
+
+    async def __aenter__(self) -> "OpenAlexScholar":
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:  # noqa: ANN001
+        await self.close()
 
     def _get_request_url(self, endpoint: str) -> str:
-        """Construct request URL with email parameter if provided."""
+        """构建请求 URL。"""
         if endpoint.startswith("/"):
             endpoint = endpoint[1:]
         return f"{self.base_url}/{endpoint}"
@@ -50,14 +65,14 @@ class OpenAlexScholar:
         return " ".join(words).strip()
 
     async def search_papers(self, query: str, limit: int = 8) -> List[Dict[str, Any]]:
-        """Search for papers using OpenAlex API.
+        """使用 OpenAlex API 异步搜索文献。
 
         Args:
-            query: Search query string
-            limit: Maximum number of results to return
+            query: 搜索查询字符串
+            limit: 最大返回结果数量
 
         Returns:
-            List of papers with their details
+            文献列表及其详细信息
         """
         # 构建基础 URL
         base_url = self._get_request_url("works")
@@ -82,26 +97,51 @@ class OpenAlexScholar:
             else "OpenAlexScholar/1.0"
         }
 
-        # 让 requests 处理参数编码和 URL 构建
-        try:
-            print(f"请求 URL: {base_url} 参数: {params}")
-            response = requests.get(base_url, params=params, headers=headers)
-            print(f"响应状态: {response.status_code}")
+        # 使用 httpx 异步客户端发送请求，带重试机制
+        max_retries = 2
+        last_exception: Exception | None = None
+        results = None
 
-            response.raise_for_status()
-            results = response.json()
-        except requests.exceptions.HTTPError as e:
-            print(f"HTTP 错误: {e}")
-            if response.status_code == 403:
-                print(
-                    "提示: 403错误通常意味着您需要提供有效的邮箱地址或者遵循礼貌池（polite pool）规则"
-                )
-            if hasattr(response, "text"):
-                print(f"响应内容: {response.text}")
-            raise
-        except Exception as e:
-            print(f"请求出错: {e}")
-            raise
+        for attempt in range(max_retries + 1):
+            try:
+                logger.info("请求 URL: %s 参数: %s (第 %d 次尝试)", base_url, params, attempt + 1)
+                response = await self._client.get(base_url, params=params, headers=headers)
+                logger.info("响应状态: %s", response.status_code)
+
+                response.raise_for_status()
+                results = response.json()
+                break  # 请求成功，跳出重试循环
+            except httpx.HTTPStatusError as e:
+                last_exception = e
+                logger.error("HTTP 错误: %s", e)
+                if e.response.status_code == 403:
+                    logger.warning(
+                        "提示: 403错误通常意味着您需要提供有效的邮箱地址或者遵循礼貌池（polite pool）规则"
+                    )
+                    logger.error("响应内容: %s", e.response.text)
+                    raise  # 403 不重试，直接抛出
+                logger.error("响应内容: %s", e.response.text)
+                if attempt < max_retries:
+                    delay = 2 ** attempt
+                    logger.warning("将在 %d 秒后重试...", delay)
+                    await asyncio.sleep(delay)
+                    continue
+                raise
+            except (httpx.TimeoutException, httpx.ConnectError) as e:
+                last_exception = e
+                logger.error("网络错误: %s", e)
+                if attempt < max_retries:
+                    delay = 2 ** attempt
+                    logger.warning("将在 %d 秒后重试...", delay)
+                    await asyncio.sleep(delay)
+                    continue
+                raise
+            except Exception as e:
+                logger.error("请求出错: %s", e)
+                raise
+
+        if results is None:
+            raise last_exception  # type: ignore[misc]
 
         papers = []
         paper_titles = []  # 用于存储论文标题
@@ -116,13 +156,12 @@ class OpenAlexScholar:
             for authorship in work.get("authorships", []):
                 author = authorship.get("author", {})
                 if author:
+                    institutions = authorship.get("institutions") or []
                     author_info = {
                         "name": author.get("display_name"),
                         "position": authorship.get("author_position"),
-                        "institution": authorship.get("institutions", [{}])[0].get(
-                            "display_name"
-                        )
-                        if authorship.get("institutions")
+                        "institution": institutions[0].get("display_name")
+                        if institutions
                         else None,
                     }
                     authors.append(author_info)
@@ -177,7 +216,7 @@ class OpenAlexScholar:
         return result
 
     def _format_citation(self, work: Dict[str, Any]) -> str:
-        """Format citation in a readable format."""
+        """格式化引用信息。"""
         # 获取所有作者
         authors = [
             authorship.get("author", {}).get("display_name")

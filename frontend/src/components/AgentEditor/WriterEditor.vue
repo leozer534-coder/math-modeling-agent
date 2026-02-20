@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch, computed } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { renderMarkdown } from '@/utils/markdown';
 import type { WriterMessage } from '@/utils/response'
 import { ScrollArea } from '@/components/ui/scroll-area'

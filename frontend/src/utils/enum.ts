@@ -5,4 +5,9 @@ export enum AgentType {
   MODELER = "ModelerAgent",
   CODER = "CoderAgent",
   WRITER = "WriterAgent",
+  REVIEWER = "ReviewerAgent",
+  ANALYZER = "AnalyzerAgent",
+  VALIDATOR = "ValidatorAgent",
+  OPTIMIZER = "OptimizerAgent",
+  SYSTEM = "SystemAgent",
 }
