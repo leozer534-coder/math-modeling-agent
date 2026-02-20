@@ -39,7 +39,8 @@ async def get_download_url(task_id: str, filename: str):
         raise HTTPException(status_code=400, detail="文件名不能为空")
 
     base_url = settings.SERVER_HOST.rstrip("/")
-    return {"download_url": f"{base_url}/static/{task_id}/{safe_filename}"}
+    # 使用带认证的 secure_files_router API
+    return {"download_url": f"{base_url}/files/tasks/{task_id}/{safe_filename}"}
 
 
 @router.get("/download_all_url")
@@ -48,7 +49,8 @@ async def get_download_all_url(task_id: str):
     _validate_task_id(task_id)
 
     base_url = settings.SERVER_HOST.rstrip("/")
-    return {"download_url": f"{base_url}/static/{task_id}/all.zip"}
+    # 使用带认证的 secure_files_router API
+    return {"download_url": f"{base_url}/files/tasks/{task_id}/all.zip"}
 
 
 @router.get("/files")

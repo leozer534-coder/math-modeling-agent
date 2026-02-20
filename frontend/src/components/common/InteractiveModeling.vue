@@ -315,13 +315,15 @@ const retryStep = async (step: { name: string; result?: unknown }) => {
 };
 
 const viewNotebook = () => {
-	// 查看Jupyter Notebook
-	window.open(`/static/${taskId.value}/notebook.ipynb`, "_blank");
+	// 查看Jupyter Notebook - 使用带认证的 secure_files_router API
+	const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+	window.open(`${baseUrl}/files/tasks/${taskId.value}/notebook.ipynb`, "_blank");
 };
 
 const viewReport = () => {
-	// 查看报告
-	window.open(`/static/${taskId.value}/report.md`, "_blank");
+	// 查看报告 - 使用带认证的 secure_files_router API
+	const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+	window.open(`${baseUrl}/files/tasks/${taskId.value}/report.md`, "_blank");
 };
 
 const downloadResults = () => {

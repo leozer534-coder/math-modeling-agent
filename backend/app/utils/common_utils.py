@@ -129,16 +129,16 @@ def get_current_files(folder_path: str, file_type: str = "all") -> list[str]:
         return []
 
 
-# 判断content是否包含图片 xx.png,对其处理为    ![filename](http://localhost:8000/static/20250428-200915-ebc154d4/filename.jpg)
+# 判断content是否包含图片 xx.png,对其处理为    ![filename](http://localhost:8000/files/tasks/20250428-200915-ebc154d4/filename.jpg)
 def transform_link(task_id: str, content: str) -> str:
-    """将 Markdown 图片的相对路径替换为带 task_id 的静态资源绝对 URL。"""
+    """将 Markdown 图片的相对路径替换为带 task_id 的静态资源绝对 URL（使用带认证的 secure_files_router API）。"""
     # task_id 格式校验：仅允许字母、数字、下划线、连字符
     if not re.match(r"^[\w-]+$", task_id):
         logger.warning("task_id 包含非法字符: %s", task_id)
         return content  # 不做替换，返回原文
     content = re.sub(
         r"!\[(.*?)\]\((.*?\.(?:png|jpg|jpeg|gif|bmp|webp))\)",
-        lambda match: f"![{match.group(1)}]({settings.SERVER_HOST}/static/{task_id}/{match.group(2)})",
+        lambda match: f"![{match.group(1)}]({settings.SERVER_HOST}/files/tasks/{task_id}/{match.group(2)})",
         content,
     )
     return content

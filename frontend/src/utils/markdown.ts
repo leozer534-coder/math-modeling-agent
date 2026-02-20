@@ -189,7 +189,8 @@ marked.use({
           // 对相对路径进行安全检查
           const safeSrc = sanitizeImageSrc(src)
           if (!safeSrc) return `![${alt}]()`
-          return `![${alt}](${baseUrl}/static/${taskId}/${safeSrc})`
+          // 使用带认证的 secure_files_router API
+          return `![${alt}](${baseUrl}/files/tasks/${taskId}/${safeSrc})`
         }
       )
     }
