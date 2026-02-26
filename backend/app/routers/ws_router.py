@@ -78,7 +78,7 @@ async def _authenticate_websocket(websocket: WebSocket) -> bool:
             )
             return False
 
-        logger.info("WebSocket 认证成功, user_id: %s", user_id)
+        logger.info("WebSocket 认证成功，user_id: %s", user_id)
         await ws_manager.send_personal_message_json(
             {"type": "auth_ok", "message": "认证成功"},
             websocket,
@@ -93,7 +93,7 @@ async def _authenticate_websocket(websocket: WebSocket) -> bool:
         )
         return False
     except (json.JSONDecodeError, KeyError) as e:
-        logger.warning("WebSocket 认证消息解析失败: %s", e)
+        logger.warning("WebSocket 认证消息解析失败：%s", e)
         await ws_manager.send_personal_message_json(
             {"type": "auth_fail", "message": "认证消息解析失败"},
             websocket,
@@ -106,6 +106,17 @@ async def websocket_endpoint(websocket: WebSocket, task_id: str):
     """WebSocket 端点：双向通信（推送任务进度 + 接收用户操作）。"""
     logger.info("WebSocket 尝试连接 task_id: %s", task_id)
 
+    # 接受 WebSocket 连接
+    await websocket.accept()
+
+    # 【安全关键】首先执行认证流程（生产环境强制认证）
+    # 认证必须在任何业务逻辑之前执行，防止未授权访问和信息泄露
+    if not await _authenticate_websocket(websocket):
+        logger.warning("WebSocket 认证失败，关闭连接，task_id: %s", task_id)
+        await websocket.close(code=1008, reason="Authentication failed")
+        return
+
+    # 认证通过后，验证任务是否存在
     redis_async_client = await redis_manager.get_client()
     if not await redis_async_client.exists(f"task_id:{task_id}"):
         logger.warning("Task not found: %s", task_id)
@@ -113,17 +124,10 @@ async def websocket_endpoint(websocket: WebSocket, task_id: str):
         return
     logger.info("WebSocket connected for task: %s", task_id)
 
-    # 建立 WebSocket 连接
+    # 建立 WebSocket 连接管理器
     await ws_manager.connect(websocket)
     websocket.timeout = 500
     logger.debug("WebSocket connection status: %s", websocket.client)
-
-    # 执行认证流程（生产环境强制认证）
-    if not await _authenticate_websocket(websocket):
-        logger.warning("WebSocket 认证失败，关闭连接, task_id: %s", task_id)
-        ws_manager.disconnect(websocket)
-        await websocket.close(code=1008, reason="Authentication failed")
-        return
 
     # 订阅 Redis 频道
     pubsub = await redis_manager.subscribe_to_task(task_id)
@@ -176,7 +180,7 @@ async def websocket_endpoint(websocket: WebSocket, task_id: str):
                     raw = await websocket.receive_text()
                     data = json.loads(raw)
                     msg_type = data.get("type", "")
-                    logger.info("收到客户端消息: task=%s, type=%s", task_id, msg_type)
+                    logger.info("收到客户端消息：task=%s, type=%s", task_id, msg_type)
 
                     if msg_type == "user_action":
                         # 用户操作：确认/取消/回退/修改/跳过/重试
@@ -208,7 +212,7 @@ async def websocket_endpoint(websocket: WebSocket, task_id: str):
                             }
                             action_key = f"user_action:{task_id}"
                             await redis_manager.set_json(action_key, action_data, expire=300)
-                            logger.info("用户消息已处理: task=%s", task_id)
+                            logger.info("用户消息已处理：task=%s", task_id)
 
                     elif msg_type == "cancel":
                         # 快捷取消
@@ -220,17 +224,17 @@ async def websocket_endpoint(websocket: WebSocket, task_id: str):
                             task_id,
                             SystemMessage(content="🛑 用户发起取消", type="warning"),
                         )
-                        logger.info("用户取消任务: task=%s", task_id)
+                        logger.info("用户取消任务：task=%s", task_id)
 
                     else:
-                        logger.debug("未知消息类型: %s", msg_type)
+                        logger.debug("未知消息类型：%s", msg_type)
 
                 except WebSocketDisconnect:
                     logger.info("WebSocket disconnected (receive), task_id: %s", task_id)
                     connection_alive = False
                     break
                 except json.JSONDecodeError as e:
-                    logger.warning("客户端消息 JSON 解析失败: %s", e)
+                    logger.warning("客户端消息 JSON 解析失败：%s", e)
                 except Exception as e:
                     logger.error("Error receiving WS message: %s", e)
                     await asyncio.sleep(0.5)
