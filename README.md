@@ -80,6 +80,13 @@ MathModelAgent 采用多 Agent 协作架构，模拟专业建模团队：
 - **微分方程**: ODE、PDE、差分方程
 - **图论**: 最短路径、最小生成树、网络流
 
+### 🌍 语言支持
+
+- **🇨🇳 中文**: 完整支持国赛（CUMCM）格式
+- **🇺🇸 英文**: 完整支持美赛（MCM/ICM）格式
+- **双语界面**: 一键切换中英文界面
+- **LaTeX 排版**: 专业美赛 LaTeX 模板（mcmthesis）
+
 ---
 
 ## 🚀 快速开始
@@ -130,11 +137,26 @@ pnpm run dev
 
 ## 📚 文档导航
 
+### 新手入门
+
 | 文档 | 描述 | 预计时间 |
 |------|------|----------|
 | [🚀 快速开始](docs/md/quickstart.md) | 5 分钟上手指南 | 5 分钟 |
 | [📦 部署教程](docs/md/deployment.md) | Docker/本地/生产部署 | 15 分钟 |
 | [📚 使用教程](docs/md/tutorial.md) | 完整功能说明 | 30 分钟 |
+
+### 竞赛指南
+
+| 文档 | 描述 | 适合竞赛 |
+|------|------|----------|
+| [🇨🇳 国赛指南](docs/md/tutorial.md) | 国赛使用教程 | CUMCM |
+| [🇺🇸 美赛指南 (EN)](docs/md/mcm-guide-en.md) | MCM/ICM English Guide | MCM/ICM |
+| [🇺🇸 美赛指南 (CN)](docs/md/mcm-guide-cn.md) | 美赛中文教程 | MCM/ICM |
+
+### 学习与案例
+
+| 文档 | 描述 | 预计时间 |
+|------|------|----------|
 | [📊 示例案例](docs/md/examples.md) | 12+ 真实案例 | 20 分钟 |
 | [❓ FAQ](docs/md/faq.md) | 常见问题解答 | 10 分钟 |
 
