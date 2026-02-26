@@ -3,243 +3,310 @@
     <img src="./docs/icon.png" height="250px">
 </p>
 <h4 align="center">
-    专为数学建模设计的 Agent<br>
-    自动完成数学建模，生成一份完整的可以直接提交的论文。
+    专为数学建模设计的 AI Agent 系统<br>
+    自动完成数学建模、代码求解、论文撰写全流程
 </h4>
 
 <h5 align="center">简体中文 | <a href="README_EN.md">English</a></h5>
 
-## 🌟 愿景：
+<p align="center">
+    <a href="https://github.com/leozer534-coder/math-modeling-agent/stargazers"><img src="https://img.shields.io/github/stars/leozer534-coder/math-modeling-agent" alt="GitHub stars"></a>
+    <a href="https://github.com/leozer534-coder/math-modeling-agent/network/members"><img src="https://img.shields.io/github/forks/leozer534-coder/math-modeling-agent" alt="GitHub forks"></a>
+    <a href="https://github.com/leozer534-coder/math-modeling-agent/issues"><img src="https://img.shields.io/github/issues/leozer534-coder/math-modeling-agent" alt="GitHub issues"></a>
+    <a href="https://github.com/leozer534-coder/math-modeling-agent/blob/main/LICENSE"><img src="https://img.shields.io/github/license/leozer534-coder/math-modeling-agent" alt="License"></a>
+    <a href="https://pd.qq.com/s/7rfbai3au"><img src="https://img.shields.io/badge/QQ 频道-MathModelAgent-blue" alt="QQ Channel"></a>
+</p>
 
-3 天的比赛时间变为 1 小时 <br> 
-自动完整一份可以获奖级别的建模论文
+## 🌟 愿景
+
+**将 3 天的比赛时间缩短为 1 小时** <br> 
+**AI 辅助完成获奖级别的数学建模论文**
+
+> ⚡ **5 分钟快速开始** → [查看快速入门指南](docs/md/quickstart.md)
 
 <p align="center">
-    <img src="./docs/index.png">
-    <img src="./docs/chat.png">
-    <img src="./docs/coder.png">
-    <img src="./docs/writer.png">
+    <img src="./docs/index.png" alt="主界面" width="800">
+    <br><em>图 1: MathModelAgent 主界面 - 智能对话式建模</em>
 </p>
+
+<p align="center">
+    <img src="./docs/chat.png" alt="对话界面" width="800">
+    <br><em>图 2: 自然语言交互，AI 自动理解问题</em>
+</p>
+
+<p align="center">
+    <img src="./docs/coder.png" alt="代码执行" width="800">
+    <br><em>图 3: 自动编写并执行 Python 代码求解</em>
+</p>
+
+<p align="center">
+    <img src="./docs/writer.png" alt="论文生成" width="800">
+    <br><em>图 4: 自动生成完整建模论文</em>
+</p>
+
+---
 
 ## ✨ 功能特性
 
-- 🔍 自动分析问题，数学建模，编写代码，纠正错误，撰写论文
-- 💻 Code Interpreter
-    - local Interpreter: 基于 jupyter , 代码保存为 notebook 方便再编辑
-    - 云端 code interpreter: [E2B](https://e2b.dev/) 和 [daytona](https://app.daytona.io/)
-- 📝 生成一份编排好格式的论文
-- 🤝 multi-agents: 建模手，代码手，论文手等
-- 🔄 multi-llms: 每个 agent 设置不同的、合适的模型
-- 🤖 支持所有模型: [litellm](https://docs.litellm.ai/docs/providers)
-- 💰 成本低：workflow agentless，不依赖 agent 框架
-- 🧩 自定义模板：prompt inject 为每个 subtask 单独设置需求
+### 🤖 多 Agent 协作系统
 
-## 🚀 后期计划
+MathModelAgent 采用多 Agent 协作架构，模拟专业建模团队：
 
-- [x] 添加并完成 webui、cli
-- [ ] 完善的教程、文档
-- [ ] 提供 web 服务
-- [ ] 英文支持（美赛）
-- [ ] 集成 latex 模板
-- [ ] 接入视觉模型
-- [x] 添加正确文献引用
-- [x] 更多测试案例
-- [x] docker 部署
-- [ ] human in loop ( HIL ): 引入用户的交互（选择模型，@agent重写，等等）
-- [ ] feedback: evaluate the result and modify
-- [x] codeinterpreter 接入云端 如 e2b 等供应商..
-- [ ] 多语言: R 语言, matlab
-- [ ] 绘图 napki,draw.io,plantuml,svg, mermaid.js
-- [ ] 添加 benchmark
-- [ ] web search tool
-- [ ] RAG 知识库
-- [ ] A2A hand off: 代码手多次反思错误，hand off 更聪明模型 agent
-- [ ] chat / agent mode
+| Agent | 角色 | 职责 |
+|-------|------|------|
+| 🎯 **协调者** | 团队 Leader | 任务分解、调度、结果整合 |
+| 📐 **建模者** | 数学专家 | 问题分析、模型建立、公式推导 |
+| 💻 **代码者** | 编程专家 | 代码实现、调试、可视化 |
+| ✍️ **写作者** | 论文专家 | 论文撰写、格式排版、参考文献 |
 
-## 视频demo
+### 🔧 核心技术
+
+- **自动建模**: 🔍 智能分析问题，选择合适的数学模型
+- **代码执行**: 💻 
+  - 本地 Jupyter：代码保存为 notebook 方便再编辑
+  - 云端执行：支持 [E2B](https://e2b.dev/) 和 [Daytona](https://app.daytona.io/) 沙箱环境
+- **论文生成**: 📝 自动生成符合比赛规范的完整论文
+- **多模型支持**: 🔄 每个 Agent 可配置不同的 LLM（DeepSeek、GPT-4、Claude 等）
+- **全模型兼容**: 🤖 支持 [LiteLLM](https://docs.litellm.ai/docs/providers) 的所有模型
+- **低成本**: 💰 Agentless 工作流，不依赖昂贵的 Agent 框架
+- **自定义模板**: 🧩 可为每个子任务单独设置 prompt 模板
+
+### 📊 支持的模型类型
+
+- **优化类**: 线性规划、整数规划、非线性规划、动态规划、多目标优化
+- **预测类**: 时间序列、回归分析、机器学习预测
+- **评价类**: AHP、模糊综合评价、TOPSIS、熵权法
+- **分类聚类**: KNN、决策树、随机森林、SVM、K-means
+- **微分方程**: ODE、PDE、差分方程
+- **图论**: 最短路径、最小生成树、网络流
+
+---
+
+## 🚀 快速开始
+
+### 方式一：Docker 部署（推荐 ⭐）
+
+```bash
+# 1. 克隆项目
+git clone https://github.com/leozer534-coder/math-modeling-agent.git
+cd math-modeling-agent
+
+# 2. 启动服务
+docker-compose up
+
+# 3. 访问界面
+# 前端：http://localhost:5173
+# 后端：http://localhost:8000
+
+# 4. 配置 API Key（侧边栏 → 头像 → API Key）
+```
+
+### 方式二：本地部署
+
+```bash
+# 1. 克隆项目
+git clone https://github.com/leozer534-coder/math-modeling-agent.git
+cd math-modeling-agent
+
+# 2. 启动 Redis
+redis-server
+
+# 3. 启动后端
+cd backend
+pip install uv
+uv sync
+source .venv/bin/activate  # Windows: venv\Scripts\activate
+ENV=DEV uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+# 4. 启动前端
+cd frontend
+pnpm i
+pnpm run dev
+```
+
+> 📖 **详细教程**: [部署文档](docs/md/deployment.md) | [快速开始](docs/md/quickstart.md)
+
+---
+
+## 📚 文档导航
+
+| 文档 | 描述 | 预计时间 |
+|------|------|----------|
+| [🚀 快速开始](docs/md/quickstart.md) | 5 分钟上手指南 | 5 分钟 |
+| [📦 部署教程](docs/md/deployment.md) | Docker/本地/生产部署 | 15 分钟 |
+| [📚 使用教程](docs/md/tutorial.md) | 完整功能说明 | 30 分钟 |
+| [📊 示例案例](docs/md/examples.md) | 12+ 真实案例 | 20 分钟 |
+| [❓ FAQ](docs/md/faq.md) | 常见问题解答 | 10 分钟 |
+
+---
+
+## 🎬 视频 Demo
 
 <video src="https://github.com/user-attachments/assets/954cb607-8e7e-45c6-8b15-f85e204a0c5d"></video>
 
-> [!CAUTION]
-> 项目处于实验探索迭代demo阶段，有许多需要改进优化改进地方，我(项目作者)很忙，有时间会优化更新
-> 欢迎贡献
+> **演示**: 使用 MathModelAgent 解决线性规划问题，自动生成完整论文
 
+📺 **更多视频教程**: [B 站](https://www.bilibili.com/)（待添加）| [YouTube](https://www.youtube.com/)（待添加）
+
+---
+
+## 🗺️ 后期计划
+
+### ✅ 已完成
+
+- [x] WebUI 和 CLI
+- [x] Docker 部署
+- [x] 云端代码执行器（E2B、Daytona）
+- [x] 文献引用
+- [x] 测试案例
+- [x] 完善的教程、文档
+
+### 🚧 开发中
+
+- [ ] Web 服务（云端部署）
+- [ ] 英文支持（美赛）
+- [ ] LaTeX 模板集成
+- [ ] 视觉模型接入
+- [ ] Human-in-the-loop (HIL)
+
+### 📋 计划中
+
+- [ ] 多语言支持（R、Matlab）
+- [ ] 更多绘图（napkin、draw.io、mermaid.js）
+- [ ] Benchmark 测试
+- [ ] Web Search Tool
+- [ ] RAG 知识库
+- [ ] A2A Hand Off
+
+---
 
 ## 📖 使用教程
 
+### 三种部署方式
 
-提供三种部署方式，请选择最适合你的方案：
-1. [docker(最简单)](#-方案一docker-部署推荐最简单)
-2. [本地部署](#-方案二-本地部署)
-3. [脚本本地部署(社区)](#-方案三自动脚本部署来自社区)
+选择最适合你的方案：
 
+1. **[Docker 部署](docs/md/deployment.md#docker-部署推荐)** - 最简单，推荐新手
+2. **[本地部署](docs/md/deployment.md#本地部署开发)** - 适合开发者
+3. **[自动脚本](https://github.com/Fitia-UCAS/mmaAutoSetupRun)** - 社区贡献
 
-下载项目
+### 快速示例
 
-```bash
-git clone https://github.com/jihe520/MathModelAgent.git # 克隆项目
+**问题**: 农场种植优化
+
+```
+问题：某农场有 50 亩土地，可种植玉米和小麦。
+玉米每亩产量 800kg，成本 500 元，售价 2 元/kg；
+小麦每亩产量 600kg，成本 400 元，售价 2.5 元/kg。
+如何分配种植面积使利润最大？
 ```
 
+**输出**:
+- ✅ 数学模型（线性规划）
+- ✅ Python 代码求解
+- ✅ 完整论文（含摘要、关键词、参考文献）
 
-> 如果你想运行 命令行版本 cli 切换到 [master](https://github.com/jihe520/MathModelAgent/tree/master) 分支,部署更简单，但未来不会更新
+📊 **更多案例**: [查看示例文档](docs/md/examples.md)
 
-
-
-### 🐳 方案一：Docker 部署（推荐：安全简单）
-
-> 确保电脑安装了 docker 环境
-
-1. 启动服务
-
-在项目文件夹下运行:
-
-```bash
-docker-compose up
-```
-
-2. 访问
-
-现在你可以访问：
-- 前端界面：http://localhost:5173
-- 后端API：http://localhost:8000
-
-3. 配置
-
-侧边栏 -> 头像 -> API Key
-
-
-### 💻 方案二: 本地部署
-
-> 确保电脑中安装好 Python, Nodejs, **Redis** 环境
-
-
-1. 安装依赖
-
-启动后端
-
-> [!CAUTION]
-> 启动 Redis, 下载和运行问 AI
-
-```bash
-cd backend # 切换到 backend 目录下
-pip install uv # 推荐使用 uv 管理 python 项目
-uv sync # 安装依赖
-# 启动后端
-# 激活 python 虚拟环境
-source .venv/bin/activate # MacOS or Linux
-venv\Scripts\activate.bat # Windows
-# MacOS or Linux 运行这条命令
-ENV=DEV uvicorn app.main:app --host 0.0.0.0 --port 8000 --ws-ping-interval 60 --ws-ping-timeout 120 --reload
-# Windows 运行这条命令
-set ENV=DEV ; uvicorn app.main:app --host 0.0.0.0 --port 8000 --ws-ping-interval 60 --ws-ping-timeout 120
-```
-
-启动前端
-
-```bash
-cd frontend # 切换到 frontend 目录下
-npm install -g pnpm
-pnpm i #确保电脑安装了 pnpm 
-pnpm run dev
-```
-修改 backend/.env.dev 的环境变量 **REDIS_URL**
-
-2. 配置
-
-侧边栏 -> 头像 -> API Key
-
-
-
-### 🚀 方案三：自动脚本部署（来自社区）
-有没有自动部署的脚本 ？
-[mmaAutoSetupRun](https://github.com/Fitia-UCAS/mmaAutoSetupRun)
-
-
-
-[教程](./docs/md/tutorial.md)
-
-运行的结果和产生在`backend/project/work_dir/xxx/*`目录下
-- notebook.ipynb: 保存运行过程中产生的代码
-- res.md: 保存最后运行产生的结果为 markdown 格式
-
-需要自定义自定义提示词模板 template ？
-Prompt Inject : [prompt](./backend/app/config/md_template.toml)
-
-网络状况太差难以配置Docker等设置？
-网络不畅时的配置过程示例：[网络环境极差时的MathModelAgent配置过程](docs/md/网络环境极差时的MathModelAgent配置过程.md)
-
+---
 
 ## 🤝 贡献和开发
 
-[DeepWiki](https://deepwiki.com/jihe520/MathModelAgent) | [Zread](https://zread.ai/jihe520/MathModelAgent)
+### 开发资源
 
+- [DeepWiki](https://deepwiki.com/leozer534-coder/math-modeling-agent) - AI 代码导航
+- [Zread](https://zread.ai/leozer534-coder/math-modeling-agent) - 代码阅读
 
-> [!TIP]
-> 如果你有跑出来好的案例可以提交 PR 在该仓库下:
-> [MathModelAgent-Example](https://github.com/jihe520/MathModelAgent-Example)
+### 贡献指南
 
-- 项目处于**开发实验阶段**（我有时间就会更新），变更较多，还存在许多 Bug，我正着手修复。
-- 希望大家一起参与，让这个项目变得更好
-- 非常欢迎使用和提交  **PRs** 和 issues 
-- 需求参考 后期计划
+1. Fork 项目
+2. 创建特性分支：`git checkout -b feature/AmazingFeature`
+3. 提交更改：`git commit -m 'Add some AmazingFeature'`
+4. 推送到分支：`git push origin feature/AmazingFeature`
+5. 提交 Pull Request
 
-clone 项目后，下载 **Todo Tree** 插件，可以查看代码中所有具体位置的 todo
+### 提交案例
 
-`.cursor/*` 有项目整体架构、rules、mcp 可以方便开发使用
+如果你有好的案例，欢迎提交到示例仓库：
+[MathModelAgent-Example](https://github.com/leozer534-coder/math-modeling-agent-Example)
 
-## 📄 版权License
+### 开发提示
 
-个人免费使用，请勿商业用途，商业用途联系我（作者）
+Clone 项目后，安装 **Todo Tree** 插件查看代码中的 TODO 注释。
 
-[License](./docs/md/License.md)
+`.cursor/*` 目录包含项目架构、规则和 MCP 配置，方便开发使用。
 
-## 🙏 Reference
+---
 
-Thanks to the following projects:
-- [OpenCodeInterpreter](https://github.com/OpenCodeInterpreter/OpenCodeInterpreter/tree/main)
+## 📄 版权 License
+
+- ✅ **个人免费使用**
+- ❌ **请勿商业用途**
+- 💼 商业用途请联系作者
+
+[查看详细 License](docs/md/License.md)
+
+---
+
+## 🙏 参考项目
+
+感谢以下优秀项目：
+
+- [OpenCodeInterpreter](https://github.com/OpenCodeInterpreter/OpenCodeInterpreter)
 - [TaskWeaver](https://github.com/microsoft/TaskWeaver)
-- [Code-Interpreter](https://github.com/MrGreyfun/Local-Code-Interpreter/tree/main)
-- [Latex](https://github.com/Veni222987/MathModelingLatexTemplate/tree/main)
+- [Code-Interpreter](https://github.com/MrGreyfun/Local-Code-Interpreter)
+- [Latex](https://github.com/Veni222987/MathModelingLatexTemplate)
 - [Agent Laboratory](https://github.com/SamuelSchmidgall/AgentLaboratory)
 - [ai-manus](https://github.com/Simpleyyt/ai-manus)
 
-## 其他
+---
 
-### 💖 Sponsor
+## 💖 赞助支持
 
-[☕️ 给作者买一杯咖啡](./docs/md/sponser.md)
+[☕️ 给作者买一杯咖啡](docs/md/sponser.md)
 
-感谢赞助
-
-#### 企业
+### 企业赞助
 
 <div align="center">
     <a href="https://share.302.ai/UoTruU" target="_blank">
-    <img src="./docs/302ai.jpg">
+        <img src="./docs/302ai.jpg" alt="302.AI" width="400">
     </a>
 </div>
 
-[302.AI](https://share.302.ai/UoTruU) 是一个按用量付费的企业级AI资源平台，提供市场上最新、最全面的AI模型和API，以及多种开箱即用的在线AI应用
+[302.AI](https://share.302.ai/UoTruU) 是一个按用量付费的企业级 AI 资源平台，提供最新的 AI 模型和 API
 
-#### 用户
+### 贡献者
 
 [danmo-tyc](https://github.com/danmo-tyc)
 
-### 👥 GROUP
+---
 
-有问题可以进群问
+## 👥 社区交流
 
-点击链接加入腾讯频道【MathModelAgent】：https://pd.qq.com/s/7rfbai3au
+有问题？加入我们的社区！
 
-点击链接加入群聊 779159301【MathModelAgent3】：https://qm.qq.com/q/Fw2cCJPoki
-
-[Discord](https://discord.gg/3Jmpqg5J)
-
-[QQ 群：699970403](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=rFKquDTSxKcWpEhRgpJD-dPhTtqLwJ9r&authKey=xYKvCFG5My4uYZTbIIoV5MIPQedW7hYzf0%2Fbs4EUZ100UegQWcQ8xEEgTczHsyU6&noverify=0&group_code=699970403)
+- **腾讯频道**: [MathModelAgent](https://pd.qq.com/s/7rfbai3au)
+- **QQ 群 1**: 699970403
+- **QQ 群 2**: 779159301
+- **Discord**: [加入服务器](https://discord.gg/3Jmpqg5J)
 
 <div align="center">
-    <img src="./docs/qq.jpg" height="400px">
+    <img src="./docs/qq.jpg" alt="QQ 群" height="400">
+    <br><em>扫码加入 QQ 交流群</em>
 </div>
 
-> [!CAUTION]
-> 免责声明: 注意，AI 生成仅供参考，目前水平直接参加国赛获奖是不可能的，但我相信 AI 和 该项目未来的成长。
+---
+
+## ⚠️ 免责声明
+
+> 本项目处于**实验探索阶段**，存在改进空间。AI 生成内容仅供参考，目前直接参加国赛获奖仍有难度。作者会持续优化更新，欢迎贡献。
+
+---
+
+<p align="center">
+    <strong>🌟 如果这个项目对你有帮助，请给一个 Star！</strong>
+</p>
+
+<p align="center">
+    Made with ❤️ by MathModelAgent Team
+</p>
